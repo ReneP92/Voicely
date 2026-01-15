@@ -25,12 +25,27 @@ docs/
 deploy/
     .gitkeep
 docker-compose.yml
+Makefile
 README.md
+widget/
+    backend/
+        Dockerfile
+        server.js
+        package.json
+    chat-widget/
+        src/
+        Dockerfile
+        package.json
+        vite.config.js
+    test-env/
+    docker-compose.dev.yml
+    docker-compose.prod.yml
+    .env.example
 voicely/
     integrations/
         hubspot/
         salesforce/
-    voicely/
+    website/
         app/
             db/
                 __schema/
@@ -55,7 +70,7 @@ voicely/
                     users.js
                     utils/
                         db/
-        website/
+        frontend/
             public/
             src/
 .env.local
@@ -75,9 +90,9 @@ git clone https://github.com/yourusername/voicely.git
 cd voicely
 ```
 
-2. Install dependencies:
+2. Install dependencies for services:
 ```bash
-cd voicely/voicely/app/services/xxxxxx_service
+cd voicely/website/app/services/xxxxxx_service
 yarn install
 ```
 
@@ -86,14 +101,76 @@ yarn install
 cp .env.local .env
 ```
 
-4. Start the services using Docker Compose from root directory:
+4. Set up widget environment variables:
+```bash
+cd widget
+cp .env.example .env.dev
+# Edit .env.dev with your configuration
+```
+
+### Usage with Makefile
+
+The project includes a Makefile for streamlined development workflows. Use `make help` to see all available commands.
+
+**Start everything (widget + services):**
+```bash
+make dev
+```
+
+**Widget-specific commands:**
+```bash
+make widget-dev      # Start widget in development mode
+make widget-build    # Build widget for production
+make widget-test     # Run widget tests
+make widget-clean    # Clean widget build artifacts
+```
+
+**Services-specific commands:**
+```bash
+make services-dev    # Start all main services
+make services-build  # Build all main services
+make services-test   # Run tests for all services
+make services-clean  # Clean service build artifacts
+```
+
+**Combined commands:**
+```bash
+make build           # Build everything
+make test            # Run all tests
+make clean           # Clean all build artifacts
+make stop            # Stop all running containers
+make logs            # View logs from all services
+```
+
+**Database commands:**
+```bash
+make db-start        # Start database only
+make db-stop         # Stop database
+```
+
+### Manual Usage (Alternative)
+To start services manually using Docker Compose:
+
+**Main services:**
 ```bash
 docker-compose up --build
 ```
 
-### Usage
-To run the user service locally, use the following command:
+**Widget (development):**
 ```bash
+cd widget
+docker-compose -f docker-compose.dev.yml up --build
+```
+
+**Widget (production):**
+```bash
+cd widget
+docker-compose -f docker-compose.prod.yml up --build
+```
+
+To run a service locally:
+```bash
+cd voicely/website/app/services/xxxxxx_service
 yarn run dev
 ```
 
@@ -117,6 +194,37 @@ The organisations service is a REST API that manages the handling and common ope
 The organisation service provides the following endpoints acessible through `api-docs/`:
 ![Organisations API](./docs/organisations_api.png)
 
+## Widget
+The widget is a chat widget component that can be embedded in customer websites. It consists of:
+
+- **Backend**: Socket.io server for real-time messaging (port 4000)
+- **Chat Widget**: React-based frontend component built with Vite
+- **Test Environment**: Nginx server for testing the widget (port 8080)
+
+### Widget Development
+The widget has separate development and production environments configured via docker-compose files:
+
+- `widget/docker-compose.dev.yml` - Development environment with hot reload
+- `widget/docker-compose.prod.yml` - Production environment
+
+Environment variables are configured in:
+- `widget/.env.dev` - Development configuration
+- `widget/.env.prod` - Production configuration
+
+See `widget/.env.example` for available configuration options.
+
+### Widget Usage
+The widget can be started using the Makefile:
+```bash
+make widget-dev    # Development mode
+make widget-build  # Production build
+```
+
+Or manually:
+```bash
+cd widget
+docker-compose -f docker-compose.dev.yml up --build
+```
 
 ## Contributing
 Contributions are welcome! Please open an issue or submit a pull request.
