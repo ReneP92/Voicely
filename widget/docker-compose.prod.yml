@@ -1,0 +1,31 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    ports:
+      - "${BACKEND_PORT:-4000}:4000"
+    environment:
+      - NODE_ENV=production
+      - PORT=4000
+      - CORS_ORIGIN=${CORS_ORIGIN:-*}
+    restart: unless-stopped
+
+  chat-widget:
+    build:
+      context: ./chat-widget
+    ports:
+      - "${WIDGET_PORT:-4173}:4173"
+    environment:
+      - NODE_ENV=production
+      - VITE_SOCKET_URL=${VITE_SOCKET_URL:-http://localhost:4000}
+    restart: unless-stopped
+    depends_on:
+      - backend
+
+  test-env:
+    image: nginx:alpine
+    volumes:
+      - ./test-env:/usr/share/nginx/html:ro
+    ports:
+      - "${TEST_ENV_PORT:-8080}:80"
+    restart: unless-stopped
