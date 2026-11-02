@@ -1,233 +1,114 @@
 # Voicely
 
-Voicely is SaaS platform for Customer Service, Marketing and Sales departments to streamline and simlify workflows. Its survey capabilities let teams allow to create meaningful and insightful surveys that deliver responses that are actionable. Offering an integration to common CRM tools such as Salesforce, Hubspot, Mailchimp, ..etc. customer data is acccisible and forms the basis to send out surveys. Utilizing AI, a knowledge base is set up to help with customer specific information. 
+Voicely is a planned AI sales and support service for B2C SMEs, starting with **physical-product Shopify shops**. Customers interact through a pop-up website chat widget for product advice, verified order enquiries, and return/exchange guidance. Requests needing staff go to an existing helpdesk or the merchant's support email, with human follow-up by email.
 
-## Architecture
-The current architecture follows a monolithic codebase. A monolithic architecture is a software design model where all components of an application are unified into a single, self-contained unit. In this approach, the entire application is built, deployed, and managed as a single entity, often referred to as a monolith. This allows for early stage simlicity and fast iteration.
+**Status: project restart and prototype.** This repository contains an early React/Socket.io widget and legacy survey-oriented services. The approved product and proposed architecture below describe the delivery direction, not capabilities already implemented.
 
-![Architecture](./docs/Architecture.svg)
+## Source of truth
 
+The [Voicely Linear project](https://linear.app/personal-rp501/project/voicely-ai-sales-and-support-agent-66ae94a7c2cb) is authoritative for product scope, architecture decisions, milestones, and issue acceptance criteria. These repository docs are a developer-facing summary aligned with that project.
 
-### System design
-TBD
+When a decision changes, reconcile the Linear overview and affected issues, then update these docs. Keep implemented behavior, approved scope, and proposed technical choices clearly labeled.
 
+- [Product scope and escalation flow](docs/product.md)
+- [Proposed system architecture](docs/architecture.md)
+- [Current widget and development notes](widget/README.md)
+- [Existing website frontend](voicely/website/frontend/README.md)
 
-## Folder Structure
-The project has the following structure:
-```
-.githooks/
-    commit-msg
-.gitignore
-.vscode/
-    settings.json
-docs/
-    ...
-deploy/
-    .gitkeep
-docker-compose.yml
-Makefile
-README.md
+## Approved MVP scope
+
+- **Sales and support:** product comparisons, buying advice, verified order/delivery enquiries, and return/exchange policy guidance.
+- **Knowledge:** merchant-uploaded product descriptions, manuals, and policies, with preview, publication/version controls, and cited answers.
+- **Data:** Shopify commerce facts, Salesforce/HubSpot customer context, verified purchase history, and tenant-specific aggregate sales signals. CRM delivery order and exact pilot coverage remain open.
+- **Distribution:** Shopify storefronts and custom-site widget embedding. Custom operational backends require their own integration contracts.
+- **Staff-ready requests:** collect details and prepare complete requests. Automated refunds, replacements, discounts, or other operational changes are follow-on work after workflow validation.
+- **Admin:** onboarding, knowledge, configuration, integration setup, preview, conversation review, usage, and handoff delivery diagnostics.
+
+### Human handoff
+
+1. The AI cannot resolve the question, the request needs staff, or the shopper asks for human help.
+2. Confirm the shopper's contact email and prepare the request with a summary, transcript, relevant sources, and authorized customer/order context.
+3. If a helpdesk is connected, create a ticket. Otherwise, email the merchant's configured support inbox from a Voicely-controlled address with the shopper's contact address as `Reply-To`.
+4. Show pending status while queued and confirm submission after the provider acknowledges acceptance.
+5. Merchant staff continue by email. Human replies do not return to the widget in the MVP.
+
+Delivery uses durable retries and duplicate prevention. A connected helpdesk outage is distinct from having no integration; uncertain delivery must be reconciled before changing channels. Provider acceptance, recipient delivery, and customer resolution are separate facts.
+
+The previously discussed admin support inbox, staff assignment, live widget replies, and AI takeover controls are superseded by the email fallback. See [the full flow](docs/product.md#escalation-and-email-follow-up).
+
+## Current implementation
+
+| Area | Repository baseline |
+| --- | --- |
+| Widget UI | React/Vite component with messages, typing indicators, local browser visitor ID, and a prototype `window.MyChatWidget.init` entry point |
+| Chat backend | Express/Socket.io; in-memory messages and store-wide rooms using caller-supplied IDs |
+| Application services | Legacy Express user, organisation, survey, question, and response services with a MySQL schema |
+| Website | Marketing/demo React frontend, not the planned merchant admin |
+| Connectors and AI | Salesforce/HubSpot scaffolding; the approved Shopify, AI retrieval, verified shopper, and helpdesk/email workflows are not implemented in the inspected application paths |
+
+The current store-wide broadcast behavior does not provide private per-shopper conversations. Browser visitor IDs do not establish customer identity. The runtime and test baseline must be established in [PER-13](https://linear.app/personal-rp501/issue/PER-13), with conversation isolation tracked in [PER-21](https://linear.app/personal-rp501/issue/PER-21).
+
+## Proposed architecture
+
+A TypeScript modular monolith with a separately deployed background worker, a React admin, and an independently distributed widget. Proposed components include Node.js/Fastify, PostgreSQL with pgvector/full-text search, S3-compatible storage, a PostgreSQL-backed job queue and transactional outbox, and HTTP plus server-sent events for chat streaming.
+
+These are **proposed choices**, to be finalized in [PER-13](https://linear.app/personal-rp501/issue/PER-13). Application code controls identity, authorization, tools, and delivery; the model interprets questions and prepares grounded answers. See [architecture](docs/architecture.md) for boundaries, data flows, and open decisions.
+
+## Repository layout
+
+```text
+docs/                          Product and architecture summaries; historical assets
 widget/
-    backend/
-        Dockerfile
-        server.js
-        package.json
-    chat-widget/
-        src/
-        Dockerfile
-        package.json
-        vite.config.js
-    test-env/
-    docker-compose.dev.yml
-    docker-compose.prod.yml
-    .env.example
+  backend/                     Prototype Express/Socket.io server
+  chat-widget/                 React/Vite widget
+  test-env/                    Static prototype host page
+  docker-compose.dev.yml       Widget development stack
+  docker-compose.prod.yml      Existing static-build configuration
 voicely/
-    integrations/
-        hubspot/
-        salesforce/
-    website/
-        app/
-            db/
-                __schema/
-                    schema.sql
-                __test_data/
-                    data.sql
-                my.cnf
-            services/
-                knowledge_base_service/
-                surveys_service/
-                users_service/
-                    .env
-                    coverage/
-                        ...
-                    Dockerfile
-                    main.js
-                    package.json
-                    scripts/
-                    tests/
-                        __mocks__
-                    main.js
-                    users.js
-                    utils/
-                        db/
-        frontend/
-            public/
-            src/
-.env.local
-.eslintrc.js
+  integrations/                Salesforce/HubSpot scaffolding
+  website/
+    frontend/                  Existing marketing/demo UI
+    app/
+      db/                      Legacy MySQL schema and test data
+      services/                Legacy Express services
+deploy/                        Deployment placeholder
+docker-compose.yml             Legacy services/database configuration
+Makefile                       Existing development command wrappers
 ```
 
-## Getting Started
-This section describes steps to get started with the development lifecycle by setting up a local environment following best practises such as the utlization of docker and test coverage.
+## Development baseline
 
-### Installation
-To get started with the project, follow these steps:
+Packages have their own manifests and Yarn lockfiles. There is no root package manifest or unified application setup. Inspect the relevant package before installing dependencies or running commands.
 
-1. Clone the repository:
+Start with [widget development notes](widget/README.md#prototype-development). They document the existing commands and current setup limitations rather than a completed MVP installation.
 
-```bash
-git clone https://github.com/yourusername/voicely.git
-cd voicely
+- `make help` lists the existing wrappers. The root Compose file references `voicely/voicely/app/...`, while services actually live under `voicely/website/app/...`; `make dev` is not yet a validated full-stack onboarding path.
+- There is no committed root `.env.local` or widget `.env.example`. Do not rely on the old template-copy instructions.
+- `make widget-test` currently invokes lint with failures suppressed; the service test wrapper also suppresses failures. Use package commands directly when establishing test health.
+
+For example, from `widget/chat-widget/`, the existing checks are:
+
+```sh
+yarn lint
+yarn build
 ```
 
-2. Install dependencies for services:
-```bash
-cd voicely/website/app/services/xxxxxx_service
-yarn install
-```
+The widget package has no test script. Legacy services have package-level Jest scripts; for example, from `voicely/website/app/services/users_service/`, run `yarn test` after installing that package's dependencies. These commands are not a claim that the runtime, builds, or tests currently pass.
 
-3. Set up the environment variables:
-```bash
-cp .env.local .env
-```
+## Delivery outline
 
-4. Set up widget environment variables:
-```bash
-cd widget
-cp .env.example .env.dev
-# Edit .env.dev with your configuration
-```
+The Linear milestones cover demand validation, platform foundations, grounded conversations, commerce/CRM identity, aggregate recommendations, and a measured pilot. The first integrated slice is a verified Shopify exchange enquiry delivered once to merchant support email, alongside a buying-advice example and validation of the connected-helpdesk route.
 
-### Usage with Makefile
+Country/language, first product category, providers, identity details, budget, and timing remain open. Consult Linear for current priorities and dependencies rather than treating this outline as a release schedule.
 
-The project includes a Makefile for streamlined development workflows. Use `make help` to see all available commands.
+## Historical references
 
-**Start everything (widget + services):**
-```bash
-make dev
-```
-
-**Widget-specific commands:**
-```bash
-make widget-dev      # Start widget in development mode
-make widget-build    # Build widget for production
-make widget-test     # Run widget tests
-make widget-clean    # Clean widget build artifacts
-```
-
-**Services-specific commands:**
-```bash
-make services-dev    # Start all main services
-make services-build  # Build all main services
-make services-test   # Run tests for all services
-make services-clean  # Clean service build artifacts
-```
-
-**Combined commands:**
-```bash
-make build           # Build everything
-make test            # Run all tests
-make clean           # Clean all build artifacts
-make stop            # Stop all running containers
-make logs            # View logs from all services
-```
-
-**Database commands:**
-```bash
-make db-start        # Start database only
-make db-stop         # Stop database
-```
-
-### Manual Usage (Alternative)
-To start services manually using Docker Compose:
-
-**Main services:**
-```bash
-docker-compose up --build
-```
-
-**Widget (development):**
-```bash
-cd widget
-docker-compose -f docker-compose.dev.yml up --build
-```
-
-**Widget (production):**
-```bash
-cd widget
-docker-compose -f docker-compose.prod.yml up --build
-```
-
-To run a service locally:
-```bash
-cd voicely/website/app/services/xxxxxx_service
-yarn run dev
-```
-
-To run tests:
-```bash
-yarn test
-```
-
-
-## Users Service
-The users service is a REST API that manages the handling and common operations for user data.
-
-### Endpoints
-The user service provides the following endpoints acessible through `api-docs/`:
-![Users API](./docs/users_api.png) 
-
-## Organisations Service
-The organisations service is a REST API that manages the handling and common operations for organisations data.
-
-### Endpoints
-The organisation service provides the following endpoints acessible through `api-docs/`:
-![Organisations API](./docs/organisations_api.png)
-
-## Widget
-The widget is a chat widget component that can be embedded in customer websites. It consists of:
-
-- **Backend**: Socket.io server for real-time messaging (port 4000)
-- **Chat Widget**: React-based frontend component built with Vite
-- **Test Environment**: Nginx server for testing the widget (port 8080)
-
-### Widget Development
-The widget has separate development and production environments configured via docker-compose files:
-
-- `widget/docker-compose.dev.yml` - Development environment with hot reload
-- `widget/docker-compose.prod.yml` - Production environment
-
-Environment variables are configured in:
-- `widget/.env.dev` - Development configuration
-- `widget/.env.prod` - Production configuration
-
-See `widget/.env.example` for available configuration options.
-
-### Widget Usage
-The widget can be started using the Makefile:
-```bash
-make widget-dev    # Development mode
-make widget-build  # Production build
-```
-
-Or manually:
-```bash
-cd widget
-docker-compose -f docker-compose.dev.yml up --build
-```
+The [original architecture diagram](docs/Architecture.svg), [users API image](docs/users_api.png), and [organisations API image](docs/organisations_api.png) describe earlier work. They are retained as historical references, not the current product or architecture specification.
 
 ## Contributing
-Contributions are welcome! Please open an issue or submit a pull request.
+
+Use the Linear project and relevant issue as the scope baseline. Keep documentation and implementation status aligned when submitting changes.
 
 ## License
+
 This project is licensed under the MIT License.

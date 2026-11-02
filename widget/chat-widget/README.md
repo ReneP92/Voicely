@@ -1,12 +1,29 @@
-# React + Vite
+# Widget frontend prototype
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React/Vite frontend for the current Socket.io messaging prototype. The planned AI, verified customer context, and helpdesk/email handoff are not implemented here yet.
 
-Currently, two official plugins are available:
+See [widget setup and limitations](../README.md), [approved product scope](../../docs/product.md), and the [Linear source of truth](https://linear.app/personal-rp501/project/voicely-ai-sales-and-support-agent-66ae94a7c2cb).
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Entry points
 
-## Expanding the ESLint configuration
+- `src/main.jsx` defines `window.MyChatWidget.init(config)` and the development mount.
+- `src/ChatWidget.jsx` accepts `storeId`, generates a visitor ID in local storage, and connects to `VITE_SOCKET_URL` (default `http://localhost:4000`).
+- `src/index.css` supplies the widget styles.
+- `vite.config.js` configures React, Tailwind, and the `@` source alias.
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+The development mount currently omits `storeId`, while the backend requires it. The static host page also uses a hard-coded bundle URL. See the parent README before treating either path as a working end-to-end installation.
+
+## Existing package commands
+
+Run from this directory after installing the package dependencies with Yarn:
+
+```sh
+yarn dev --host
+yarn lint
+yarn build
+yarn preview --host
+```
+
+There is no package test script. `VITE_SOCKET_URL` is read by Vite and compiled into built assets; changing a static server's runtime environment does not rewrite it.
+
+The proposed async loader/iframe and HTTP/server-sent-event architecture is tracked in [PER-13](https://linear.app/personal-rp501/issue/PER-13) and [PER-16](https://linear.app/personal-rp501/issue/PER-16). The approved widget handoff leads to human email follow-up rather than live staff replies in chat.
