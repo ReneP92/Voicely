@@ -1,0 +1,8 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended", "helpers:pinGitHubActionDigests"],
+  "rangeStrategy": "pin",
+  "lockFileMaintenance": { "enabled": true },
+  "ignorePaths": ["widget/**", "voicely/**", "docs/brand/**"],
+  "packageRules": [{ "matchUpdateTypes": ["major"], "automerge": false }]
+}

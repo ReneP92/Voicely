@@ -1,8 +1,10 @@
 # Voicely widget
 
+**Historical prototype, outside the active Bun workspace.** Start new development from the [root README](../README.md). This code may be replaced; its presence does not define the new application.
+
 The widget is the planned customer-facing chat surface for Voicely's AI sales and support agent. The current implementation is an early React/Vite and Express/Socket.io messaging prototype.
 
-The [Linear project](https://linear.app/personal-rp501/project/voicely-ai-sales-and-support-agent-66ae94a7c2cb) is the source of truth. See the [product scope](../docs/product.md) and [proposed architecture](../docs/architecture.md) for the delivery direction.
+The [Linear project](https://linear.app/personal-rp501/project/voicely-ai-sales-and-support-agent-66ae94a7c2cb) is the source of truth. See the [product scope](../docs/product.md) and [approved architecture](../docs/architecture.md).
 
 ## Approved experience - planned
 
@@ -15,7 +17,7 @@ The [Linear project](https://linear.app/personal-rp501/project/voicely-ai-sales-
 
 The merchant admin covers configuration, knowledge, integration setup, conversation review, and delivery diagnostics. A fallback staff inbox, live staff chat, assignment, and AI takeover controls are superseded MVP alternatives.
 
-The proposed delivery mechanism is an asynchronous script loader with iframe isolation and versioned assets. HTTP plus server-sent events is the proposed conversation transport. Neither replaces the current Socket.io prototype until the architecture is specified and implemented.
+The approved delivery mechanism is an asynchronous loader with a lazy React iframe and versioned assets. HTTP plus authenticated SSE is the approved conversation transport. Those features are not yet implemented in this historical Socket.io prototype.
 
 ## Current implementation
 
@@ -63,7 +65,7 @@ docker compose --env-file .env.dev -f docker-compose.dev.yml config
 docker compose --env-file .env.dev -f docker-compose.dev.yml up --build
 ```
 
-Compose does not automatically select `.env.dev` or `.env.prod`. The existing `make widget-dev` wrapper omits `--env-file`; it uses exported variables, Compose's default `.env` handling, or the YAML defaults. The commands above assume the local file has been created.
+Compose does not automatically select `.env.dev` or `.env.prod`. The commands above assume the local file has been created. Root Makefile commands now target the new Bun foundation.
 
 ### Known setup gaps
 
@@ -88,7 +90,7 @@ yarn build
 yarn preview --host
 ```
 
-The package has no test script. `make widget-test` runs lint with failures suppressed, so it cannot establish a passing test baseline. See [the frontend package notes](chat-widget/README.md) for entry points.
+The historical package has no test script and is not part of the active verification suite. See [the frontend package notes](chat-widget/README.md) for its old entry points.
 
 The backend entry command is `node server.js`, run from `widget/backend/` with its dependencies installed and the setup gaps above addressed.
 

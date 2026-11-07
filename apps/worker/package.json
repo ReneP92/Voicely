@@ -1,0 +1,8 @@
+{
+  "name": "@voicely/worker",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@voicely/core": "workspace:*"
+  }
+}

@@ -1,0 +1,11 @@
+node_modules
+**/dist
+bun.lock
+yarn.lock
+voicely
+widget
+docs/brand
+docs/*.svg
+test-results
+playwright-report
+docker-compose.yml

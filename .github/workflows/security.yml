@@ -1,0 +1,31 @@
+name: Dependency and secret checks
+on:
+  pull_request:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '23 8 * * 1'
+permissions:
+  contents: read
+jobs:
+  dependencies:
+    name: Audit dependencies
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: oven-sh/setup-bun@v2
+        with:
+          bun-version-file: .bun-version
+      - run: bun install --frozen-lockfile
+      - run: bun audit --audit-level high
+  secrets:
+    name: Scan for secrets
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Scan repository history
+        run: docker run --rm -v "$PWD:/repo" zricethezav/gitleaks:v8.24.3 git /repo --redact --no-banner

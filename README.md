@@ -2,7 +2,24 @@
 
 Voicely is a planned AI sales and support service for B2C SMEs, starting with **physical-product Shopify shops**. Customers interact through a pop-up website chat widget for product advice, verified order enquiries, and return/exchange guidance. Requests needing staff go to an existing helpdesk or the merchant's support email, with human follow-up by email.
 
-**Status: project restart and prototype.** This repository contains an early React/Socket.io widget and legacy survey-oriented services. The approved product and proposed architecture below describe the delivery direction, not capabilities already implemented.
+**Status: local engineering foundation.** The Bun workspace runs a Fastify API, a separately deployed pg-boss worker, PostgreSQL/pgvector, and repeatable synthetic demo fixtures. The customer-facing AI application, merchant admin, Shopify integration and external delivery are still planned. Historical prototypes remain under `widget/` and `voicely/`.
+
+## Quick start
+
+Install Bun **1.4.4**, Node **24.19.0** and Docker with Compose. From the repository root:
+
+```sh
+bun run setup
+bun run dev
+```
+
+Setup installs the frozen lockfile, creates `.env` if absent, starts local PostgreSQL, applies migrations, and resets the two synthetic demo tenants. It preserves other tenants. The database binds to localhost on port 54329. The API binds to localhost on port 4100.
+
+- Readiness: <http://127.0.0.1:4100/health/ready>
+- Demo catalog: <http://127.0.0.1:4100/v1/demo/trailside-supply/products>
+- Full verification: `bun run verify`
+
+Bun manages dependencies and scripts; the API and worker run on the approved Node.js LTS runtime. See [development](docs/development.md) for commands, tests and troubleshooting.
 
 ## Source of truth
 
@@ -11,7 +28,10 @@ The [Voicely Linear project](https://linear.app/personal-rp501/project/voicely-a
 When a decision changes, reconcile the Linear overview and affected issues, then update these docs. Keep implemented behavior, approved scope, and proposed technical choices clearly labeled.
 
 - [Product scope and escalation flow](docs/product.md)
-- [Proposed system architecture](docs/architecture.md)
+- [Approved system architecture](docs/architecture.md)
+- [First-slice screens, API contracts and state transitions (PER-32)](https://linear.app/personal-rp501/issue/PER-32)
+- [Development workflow and verification](docs/development.md)
+- [Trailside Supply demo fixtures](docs/demo.md)
 - [Current widget and development notes](widget/README.md)
 - [Existing website frontend](voicely/website/frontend/README.md)
 
@@ -19,7 +39,7 @@ When a decision changes, reconcile the Linear overview and affected issues, then
 
 - **Sales and support:** product comparisons, buying advice, verified order/delivery enquiries, and return/exchange policy guidance.
 - **Knowledge:** merchant-uploaded product descriptions, manuals, and policies, with preview, publication/version controls, and cited answers.
-- **Data:** Shopify commerce facts, Salesforce/HubSpot customer context, verified purchase history, and tenant-specific aggregate sales signals. CRM delivery order and exact pilot coverage remain open.
+- **Data:** Shopify commerce facts, HubSpot-first CRM context with Salesforce second, verified purchase history, and tenant-specific aggregate sales signals. Exact pilot fields and permissions remain validation gates.
 - **Distribution:** Shopify storefronts and custom-site widget embedding. Custom operational backends require their own integration contracts.
 - **Staff-ready requests:** collect details and prepare complete requests. Automated refunds, replacements, discounts, or other operational changes are follow-on work after workflow validation.
 - **Admin:** onboarding, knowledge, configuration, integration setup, preview, conversation review, usage, and handoff delivery diagnostics.
@@ -32,31 +52,40 @@ When a decision changes, reconcile the Linear overview and affected issues, then
 4. Show pending status while queued and confirm submission after the provider acknowledges acceptance.
 5. Merchant staff continue by email. Human replies do not return to the widget in the MVP.
 
-Delivery uses durable retries and duplicate prevention. A connected helpdesk outage is distinct from having no integration; uncertain delivery must be reconciled before changing channels. Provider acceptance, recipient delivery, and customer resolution are separate facts.
+Delivery uses durable retries and duplicate prevention. A connected helpdesk outage is distinct from having no integration; the first slice prohibits automatic cross-channel rerouting and blind resend after uncertain acceptance. Provider acceptance, recipient delivery, and customer resolution are separate facts.
 
 The previously discussed admin support inbox, staff assignment, live widget replies, and AI takeover controls are superseded by the email fallback. See [the full flow](docs/product.md#escalation-and-email-follow-up).
 
 ## Current implementation
 
-| Area | Repository baseline |
-| --- | --- |
-| Widget UI | React/Vite component with messages, typing indicators, local browser visitor ID, and a prototype `window.MyChatWidget.init` entry point |
-| Chat backend | Express/Socket.io; in-memory messages and store-wide rooms using caller-supplied IDs |
-| Application services | Legacy Express user, organisation, survey, question, and response services with a MySQL schema |
-| Website | Marketing/demo React frontend, not the planned merchant admin |
-| Connectors and AI | Salesforce/HubSpot scaffolding; the approved Shopify, AI retrieval, verified shopper, and helpdesk/email workflows are not implemented in the inspected application paths |
+| Area                 | Repository baseline                                                                                                                                                       |
+| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Active foundation    | Bun workspace in `apps/` and `packages/`; Fastify public demo catalog, PostgreSQL migrations/RLS, pg-boss catalog-audit worker, unit/integration/process E2E tests        |
+| Demo fixtures        | Trailside Supply: 20 products, 4 synthetic orders, 4 policies, 12 evaluation scenarios; separate isolation tenant                                                         |
+| Historical widget UI | React/Vite component with messages, typing indicators, local browser visitor ID, and a prototype `window.MyChatWidget.init` entry point                                   |
+| Chat backend         | Express/Socket.io; in-memory messages and store-wide rooms using caller-supplied IDs                                                                                      |
+| Application services | Legacy Express user, organisation, survey, question, and response services with a MySQL schema                                                                            |
+| Website              | Marketing/demo React frontend, not the planned merchant admin                                                                                                             |
+| Connectors and AI    | Salesforce/HubSpot scaffolding; the approved Shopify, AI retrieval, verified shopper, and helpdesk/email workflows are not implemented in the inspected application paths |
 
 The current store-wide broadcast behavior does not provide private per-shopper conversations. Browser visitor IDs do not establish customer identity. The runtime and test baseline must be established in [PER-13](https://linear.app/personal-rp501/issue/PER-13), with conversation isolation tracked in [PER-21](https://linear.app/personal-rp501/issue/PER-21).
 
-## Proposed architecture
+## Approved architecture
 
-A TypeScript modular monolith with a separately deployed background worker, a React admin, and an independently distributed widget. Proposed components include Node.js/Fastify, PostgreSQL with pgvector/full-text search, S3-compatible storage, a PostgreSQL-backed job queue and transactional outbox, and HTTP plus server-sent events for chat streaming.
+A strict TypeScript modular monolith with separately deployed workers, a standalone React admin, and an independently distributed iframe widget. Bun supplies workspace tooling; Node.js/Fastify runs the services. PostgreSQL provides relational data, pgvector/full-text retrieval and pg-boss transactional jobs. Chat will use HTTP submissions and authenticated SSE.
 
-These are **proposed choices**, to be finalized in [PER-13](https://linear.app/personal-rp501/issue/PER-13). Application code controls identity, authorization, tools, and delivery; the model interprets questions and prepares grounded answers. See [architecture](docs/architecture.md) for boundaries, data flows, and open decisions.
+AWS `us-east-1` is selected: ECS Fargate/ALB, RDS PostgreSQL, S3/CloudFront, Cognito, SES, Secrets Manager and CloudWatch. CDK/OIDC deployment is tracked in [PER-30](https://linear.app/personal-rp501/issue/PER-30); nothing is deployed by local setup. Application code controls identity, authorization, tools and delivery. See [architecture](docs/architecture.md) for boundaries and remaining validation.
 
 ## Repository layout
 
 ```text
+apps/api/                      Active Fastify API
+apps/worker/                   Active pg-boss worker
+packages/core/                 Shared configuration, database, queue and demo fixtures
+scripts/                       Local setup, migrations, seed and process supervision
+tests/                         Unit, real PostgreSQL and built-process E2E checks
+.github/                       CI, security checks and pull-request template
+compose.yaml                   Active local PostgreSQL/pgvector dependency
 docs/                          Product and architecture summaries; historical assets
 widget/
   backend/                     Prototype Express/Socket.io server
@@ -71,35 +100,24 @@ voicely/
     app/
       db/                      Legacy MySQL schema and test data
       services/                Legacy Express services
-deploy/                        Deployment placeholder
-docker-compose.yml             Legacy services/database configuration
-Makefile                       Existing development command wrappers
+deploy/                        Historical deployment placeholder
+docker-compose.yml             Historical services/database configuration; not the startup path
+Makefile                       Convenience wrappers around Bun commands
 ```
 
 ## Development baseline
 
-Packages have their own manifests and Yarn lockfiles. There is no root package manifest or unified application setup. Inspect the relevant package before installing dependencies or running commands.
+The active workspace uses one `bun.lock`, pinned toolchain versions, strict TypeScript, ESLint, Prettier, Vitest and Playwright. `bun run verify` runs formatting, lint, compilation, unit tests, real PostgreSQL integration tests and built-process API/worker E2E tests. Test failures propagate correctly.
 
-Start with [widget development notes](widget/README.md#prototype-development). They document the existing commands and current setup limitations rather than a completed MVP installation.
+The legacy packages and their lockfiles are outside the active workspace. Their current test suites are not claimed to pass. Their APIs and data model will be replaced; useful frontend/brand assets can be reused selectively. Any externally persisted legacy data still requires an inventory before migration or deletion.
 
-- `make help` lists the existing wrappers. The root Compose file references `voicely/voicely/app/...`, while services actually live under `voicely/website/app/...`; `make dev` is not yet a validated full-stack onboarding path.
-- There is no committed root `.env.local` or widget `.env.example`. Do not rely on the old template-copy instructions.
-- `make widget-test` currently invokes lint with failures suppressed; the service test wrapper also suppresses failures. Use package commands directly when establishing test health.
-
-For example, from `widget/chat-widget/`, the existing checks are:
-
-```sh
-yarn lint
-yarn build
-```
-
-The widget package has no test script. Legacy services have package-level Jest scripts; for example, from `voicely/website/app/services/users_service/`, run `yarn test` after installing that package's dependencies. These commands are not a claim that the runtime, builds, or tests currently pass.
+GitHub workflow files are supplied. Remote CI execution, required branch checks and Renovate installation require repository activation; local passing checks do not establish those settings.
 
 ## Delivery outline
 
 The Linear milestones cover demand validation, platform foundations, grounded conversations, commerce/CRM identity, aggregate recommendations, and a measured pilot. The first integrated slice is a verified Shopify exchange enquiry delivered once to merchant support email, alongside a buying-advice example and validation of the connected-helpdesk route.
 
-Country/language, first product category, providers, identity details, budget, and timing remain open. Consult Linear for current priorities and dependencies rather than treating this outline as a release schedule.
+The initial market is US English, physical-product ecommerce. Trailside Supply is a fictional outdoor clothing/accessories demo, not a design partner. HubSpot CRM precedes Salesforce; SES is the initial email provider. Shopper proof, model evaluation, helpdesk capabilities, measured costs and release timing remain open. Consult Linear for current priorities and dependencies.
 
 ## Historical references
 

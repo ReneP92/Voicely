@@ -1,0 +1,20 @@
+name: voicely-foundation
+services:
+  postgres:
+    image: pgvector/pgvector:0.8.1-pg17
+    environment:
+      POSTGRES_USER: voicely
+      POSTGRES_PASSWORD: voicely-local
+      POSTGRES_DB: voicely
+    ports:
+      - '127.0.0.1:${POSTGRES_PORT:-54329}:5432'
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+      - ./scripts/local-roles.sql:/docker-entrypoint-initdb.d/roles.sql:ro
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U voicely -d voicely']
+      interval: 2s
+      timeout: 5s
+      retries: 30
+volumes:
+  postgres-data:
