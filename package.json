@@ -1,0 +1,46 @@
+{
+  "name": "voicely",
+  "private": true,
+  "type": "module",
+  "packageManager": "bun@1.4.4",
+  "engines": {
+    "node": "24.x",
+    "bun": "1.4.4"
+  },
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "setup": "bun scripts/setup.ts",
+    "dev": "bun scripts/dev.ts",
+    "dev:api": "node --env-file-if-exists=.env --conditions=development --watch apps/api/src/main.ts",
+    "dev:worker": "node --env-file-if-exists=.env --conditions=development --watch apps/worker/src/main.ts",
+    "build": "tsc -b",
+    "typecheck": "tsc -b && tsc -p tsconfig.tools.json --noEmit",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "check": "bun run format:check && bun run lint && bun run typecheck",
+    "test": "vitest run --project unit",
+    "test:integration": "node --env-file-if-exists=.env node_modules/vitest/vitest.mjs run --project integration",
+    "test:e2e": "node --env-file-if-exists=.env node_modules/@playwright/test/cli.js test",
+    "db:migrate": "node --env-file-if-exists=.env --conditions=development scripts/migrate.ts",
+    "demo:reset": "node --env-file-if-exists=.env --conditions=development scripts/seed.ts",
+    "db:up": "docker compose -f compose.yaml up -d --wait",
+    "db:stop": "docker compose -f compose.yaml stop",
+    "verify": "bun run check && bun run test && bun run test:integration && bun run test:e2e"
+  },
+  "devDependencies": {
+    "@eslint/js": "10.0.1",
+    "@playwright/test": "1.64.1",
+    "@types/bun": "1.4.4",
+    "@types/node": "24.19.2",
+    "@types/pg": "8.23.1",
+    "eslint": "10.14.0",
+    "prettier": "3.9.10",
+    "typescript": "5.9.3",
+    "typescript-eslint": "8.72.1",
+    "vitest": "5.1.0"
+  }
+}

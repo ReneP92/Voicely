@@ -2,21 +2,23 @@
 
 **Status: approved product direction, with implementation planned.** This summary follows the [Voicely Linear project](https://linear.app/personal-rp501/project/voicely-ai-sales-and-support-agent-66ae94a7c2cb), which remains the source of truth. Update Linear and affected issues when decisions change, then synchronize repository documentation.
 
-See the [root README](../README.md#current-implementation) for the current prototype and [architecture](architecture.md) for proposed technical choices.
+See the [root README](../README.md#current-implementation) for the foundation and prototypes, and [architecture](architecture.md) for approved choices and remaining validation.
 
 ## Audience and goal
 
 Voicely helps B2C SMEs answer buying and post-purchase questions through a website chat widget. The first pilot targets **physical-product Shopify shops**. Sales and support are equal goals.
 
+The initial market is **US English**. The fictional **Trailside Supply** outdoor clothing/accessories merchant supplies synthetic demos and test cases. It is not a committed design partner or evidence of commercial demand. See [demo fixtures](demo.md).
+
 Support Shopify storefronts and custom-site widget embedding. Embedding on a custom website does not provide access to its operational systems automatically. Digital products, services, and subscription-specific workflows are later expansion candidates.
 
 ## Initial journeys
 
-| Journey | Planned behavior |
-| --- | --- |
-| Buying advice | Clarify needs and compare suitable products or variants using published content and current permitted commerce facts |
-| Order and delivery enquiry | Verify the shopper, retrieve authorized order/fulfillment facts, explain available evidence, and prepare an investigation request if needed |
-| Return or exchange | Verify the order/item, collect the reason and desired variant, apply the merchant's published policy with provenance, flag uncertainty or unavailable stock, and prepare a request for staff |
+| Journey                    | Planned behavior                                                                                                                                                                             |
+| -------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Buying advice              | Clarify needs and compare suitable products or variants using published content and current permitted commerce facts                                                                         |
+| Order and delivery enquiry | Verify the shopper, retrieve authorized order/fulfillment facts, explain available evidence, and prepare an investigation request if needed                                                  |
+| Return or exchange         | Verify the order/item, collect the reason and desired variant, apply the merchant's published policy with provenance, flag uncertainty or unavailable stock, and prepare a request for staff |
 
 The baseline is **answers, authorized lookups, and request preparation**. Submitting a request does not issue a refund, apply a discount, replace an item, or complete an exchange. Selected automated operational actions require validated merchant rules, integrations, and individually specified follow-on work.
 
@@ -24,7 +26,7 @@ The baseline is **answers, authorized lookups, and request preparation**. Submit
 
 - Merchants upload product descriptions, manuals, and policies through the admin panel. Content needs preview, publication/version control, and accessible citations.
 - Anonymous shoppers receive approved public information. Private orders and CRM history require verified identity and record-level authorization.
-- Shopify supplies commerce facts; Salesforce and HubSpot enrich customer context. Delivery order and exact CRM pilot coverage remain open.
+- Shopify supplies commerce facts; HubSpot CRM comes first, Salesforce second. Exact connector fields and permissions remain specification work.
 - Customer purchase history can personalize permitted answers. Tenant-specific aggregate sales patterns can inform recommendations after product suitability and compatibility checks.
 - Current prices, stock, and fulfillment facts need operational sources with freshness rules. Product documents alone cannot establish them.
 - A contact email confirmed for follow-up is distinct from identity proof for access to private order information.
@@ -42,7 +44,7 @@ Escalate when the AI cannot resolve the question, a change needs staff, or the s
 5. Show pending status while queued. Confirm submission only after acknowledged ticket creation or outbound email-provider acceptance. Expose failures honestly.
 6. Human replies continue by email after the shopper leaves the site. They do not return to the widget in the MVP.
 
-Use durable retries, duplicate prevention, and reconciliation for uncertain outcomes. A temporarily unavailable connected helpdesk is not the same as having no helpdesk configured. Any cross-channel rerouting must be specified before implementation so a timeout after remote ticket creation cannot produce duplicate tickets and emails.
+Use durable retries, duplicate prevention, and reconciliation for uncertain outcomes. A temporarily unavailable connected helpdesk is not the same as having no helpdesk configured. [PER-32](https://linear.app/personal-rp501/issue/PER-32) specifies no automatic cross-channel rerouting and no blind resend after uncertain acceptance. A future rerouting/force-resend feature needs a separate explicit decision.
 
 ### Delivery is not resolution
 
@@ -91,15 +93,15 @@ A merchant connects a Shopify development store, publishes a return policy, inst
 
 ## Open decisions and Linear references
 
-Open decisions include first product category, country/language, first helpdesk and outbound email providers, CRM delivery order/coverage, guest verification, merchant policies and response expectations, outage rerouting, recruitment, budget, ownership, and timing.
+US English, the outdoor-products demo, HubSpot-first CRM, SES email and AWS hosting are selected. PER-32 now specifies first-slice screens, contracts, review/submission states and failure behavior. Remaining validation includes actual pilot category fit, helpdesk capabilities, exact CRM coverage, guest verification, real merchant policies/response expectations, retention, recruitment, measured costs, ownership and timing. The founder has set no hard budget cap; optimize measured performance and quality per dollar.
 
-| Topic | Authoritative issue |
-| --- | --- |
-| Demand and design partners | [PER-10](https://linear.app/personal-rp501/issue/PER-10) |
-| Answer quality and incremental CRM value | [PER-11](https://linear.app/personal-rp501/issue/PER-11) |
-| Admin scope | [PER-18](https://linear.app/personal-rp501/issue/PER-18) |
+| Topic                                                  | Authoritative issue                                      |
+| ------------------------------------------------------ | -------------------------------------------------------- |
+| Demand and design partners                             | [PER-10](https://linear.app/personal-rp501/issue/PER-10) |
+| Answer quality and incremental CRM value               | [PER-11](https://linear.app/personal-rp501/issue/PER-11) |
+| Admin scope                                            | [PER-18](https://linear.app/personal-rp501/issue/PER-18) |
 | Pilot scope, economics, and founder scenario inventory | [PER-25](https://linear.app/personal-rp501/issue/PER-25) |
-| Helpdesk/email delivery | [PER-26](https://linear.app/personal-rp501/issue/PER-26) |
-| Live pilot outcomes | [PER-15](https://linear.app/personal-rp501/issue/PER-15) |
+| Helpdesk/email delivery                                | [PER-26](https://linear.app/personal-rp501/issue/PER-26) |
+| Live pilot outcomes                                    | [PER-15](https://linear.app/personal-rp501/issue/PER-15) |
 
 The full milestone and dependency graph lives in Linear rather than this summary.

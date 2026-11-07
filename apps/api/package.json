@@ -1,0 +1,9 @@
+{
+  "name": "@voicely/api",
+  "private": true,
+  "type": "module",
+  "dependencies": {
+    "@voicely/core": "workspace:*",
+    "fastify": "5.12.8"
+  }
+}

@@ -25,6 +25,9 @@ out/
 *.env
 
 # Testing
+test-results/
+playwright-report/
+cdk.out/
 coverage/
 *.lcov
 .nyc_output/

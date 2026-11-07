@@ -1,8 +1,10 @@
 # Existing website frontend
 
+**Historical prototype, outside the active Bun workspace.** New application work starts from the root README. Useful visual assets may be reused, but this is not the active admin implementation.
+
 This React/Vite package currently contains marketing/demo components assembled by `src/App.jsx`. It is not the planned Voicely merchant admin panel.
 
-The [Linear project](https://linear.app/personal-rp501/project/voicely-ai-sales-and-support-agent-66ae94a7c2cb) is the source of truth. See the [root README](../../../README.md), [product scope](../../../docs/product.md), and [proposed architecture](../../../docs/architecture.md).
+The [Linear project](https://linear.app/personal-rp501/project/voicely-ai-sales-and-support-agent-66ae94a7c2cb) is the source of truth. See the [root README](../../../README.md), [product scope](../../../docs/product.md), and [approved architecture](../../../docs/architecture.md).
 
 ## Planned admin scope
 
