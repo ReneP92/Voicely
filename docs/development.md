@@ -4,7 +4,7 @@
 
 Bun 1.4.4 manages dependencies and scripts. Node 24.19.0 runs API/worker code in development and compiled JavaScript in process E2E checks. Docker Compose supplies PostgreSQL 17 with pgvector 0.8.1. Versions are pinned in the root manifests/version files and Compose configuration.
 
-The active workspace contains `apps/api`, `apps/worker` and `packages/core`. Build references compile shared code before entry points. Source imports use the `development` export condition; built processes resolve compiled exports. Historical `widget/` and `voicely/` packages are excluded.
+The active workspace contains `apps/api`, `apps/worker` and `packages/core`. Build references compile shared code before entry points. Source imports use the `development` export condition; built processes resolve compiled exports. Historical `widget/` and `voicely/` packages have been removed; consult Git history if needed.
 
 ## Commands
 

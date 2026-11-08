@@ -88,11 +88,6 @@ docker-compose.override.yml
 tmp/
 temp/
 
-# Lock files (uncomment if you don't want to commit them)
-# package-lock.json
-# yarn.lock
-# pnpm-lock.yaml
-
 # Misc
 .bin/
 *.bak
@@ -103,13 +98,6 @@ temp/
 *.swo
 *.swp
 .vscode-test/
-
-# Service-specific
-voicely/website/app/services/*/coverage/
-voicely/website/app/services/*/node_modules/
-widget/*/dist/
-widget/*/node_modules/
-widget/*/.vite/
 
 # Database
 *.sqlite

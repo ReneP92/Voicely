@@ -6,8 +6,6 @@ export default tseslint.config(
     ignores: [
       'node_modules/**',
       '**/dist/**',
-      'voicely/**',
-      'widget/**',
       'docs/**',
       'test-results/**',
       'playwright-report/**',
