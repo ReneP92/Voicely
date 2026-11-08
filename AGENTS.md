@@ -3,7 +3,7 @@
 - Linear project P-PER-1 owns scope, decisions and acceptance criteria. Notion is the knowledge hub; repository docs describe executable behavior.
 - Use Bun 1.4.4 for dependency management and scripts. API/worker run on Node 24 LTS. Do not introduce npm, Yarn or pnpm lockfiles into the active workspace.
 - Start at README.md. `bun run setup` provisions local dependencies; `bun run verify` is the completion gate. Required checks must propagate failures.
-- Active code lives in apps/ and packages/. widget/ and voicely/ are replaceable historical prototypes, excluded from the new workspace. Inspect before reusing them.
+- Active code lives in apps/ and packages/. Removed historical prototypes are available in Git history; inspect before reusing them. Current brand assets live in docs/brand/.
 - Keep application entry points thin. Shared modules do not import apps. Keep domain ownership explicit as the product modules grow.
 - Treat site IDs as public configuration, never authentication. Authorize shopper and tenant access before tools or models. Use transaction-local tenant context and test real database roles.
 - Persist business records independently of queue retention. Enqueue jobs in the same transaction; external effects still require provider-specific idempotency/reconciliation.

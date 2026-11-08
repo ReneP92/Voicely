@@ -2,7 +2,7 @@
 
 **Status: approved product direction, with implementation planned.** This summary follows the [Voicely Linear project](https://linear.app/personal-rp501/project/voicely-ai-sales-and-support-agent-66ae94a7c2cb), which remains the source of truth. Update Linear and affected issues when decisions change, then synchronize repository documentation.
 
-See the [root README](../README.md#current-implementation) for the foundation and prototypes, and [architecture](architecture.md) for approved choices and remaining validation.
+See the [root README](../README.md#current-implementation) for the implemented foundation, and [architecture](architecture.md) for approved choices and remaining validation.
 
 ## Audience and goal
 

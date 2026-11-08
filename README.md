@@ -2,7 +2,7 @@
 
 Voicely is a planned AI sales and support service for B2C SMEs, starting with **physical-product Shopify shops**. Customers interact through a pop-up website chat widget for product advice, verified order enquiries, and return/exchange guidance. Requests needing staff go to an existing helpdesk or the merchant's support email, with human follow-up by email.
 
-**Status: local engineering foundation.** The Bun workspace runs a Fastify API, a separately deployed pg-boss worker, PostgreSQL/pgvector, and repeatable synthetic demo fixtures. The customer-facing AI application, merchant admin, Shopify integration and external delivery are still planned. Historical prototypes remain under `widget/` and `voicely/`.
+**Status: local engineering foundation.** The Bun workspace runs a Fastify API, a separately deployed pg-boss worker, PostgreSQL/pgvector, and repeatable synthetic demo fixtures. The customer-facing AI application, merchant admin, Shopify integration and external delivery are still planned.
 
 ## Quick start
 
@@ -32,8 +32,7 @@ When a decision changes, reconcile the Linear overview and affected issues, then
 - [First-slice screens, API contracts and state transitions (PER-32)](https://linear.app/personal-rp501/issue/PER-32)
 - [Development workflow and verification](docs/development.md)
 - [Trailside Supply demo fixtures](docs/demo.md)
-- [Current widget and development notes](widget/README.md)
-- [Existing website frontend](voicely/website/frontend/README.md)
+- [Brand assets and usage](docs/brand/README.md)
 
 ## Approved MVP scope
 
@@ -58,17 +57,14 @@ The previously discussed admin support inbox, staff assignment, live widget repl
 
 ## Current implementation
 
-| Area                 | Repository baseline                                                                                                                                                       |
-| -------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Active foundation    | Bun workspace in `apps/` and `packages/`; Fastify public demo catalog, PostgreSQL migrations/RLS, pg-boss catalog-audit worker, unit/integration/process E2E tests        |
-| Demo fixtures        | Trailside Supply: 20 products, 4 synthetic orders, 4 policies, 12 evaluation scenarios; separate isolation tenant                                                         |
-| Historical widget UI | React/Vite component with messages, typing indicators, local browser visitor ID, and a prototype `window.MyChatWidget.init` entry point                                   |
-| Chat backend         | Express/Socket.io; in-memory messages and store-wide rooms using caller-supplied IDs                                                                                      |
-| Application services | Legacy Express user, organisation, survey, question, and response services with a MySQL schema                                                                            |
-| Website              | Marketing/demo React frontend, not the planned merchant admin                                                                                                             |
-| Connectors and AI    | Salesforce/HubSpot scaffolding; the approved Shopify, AI retrieval, verified shopper, and helpdesk/email workflows are not implemented in the inspected application paths |
+| Area              | Repository baseline                                                                                                                                                |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Active foundation | Bun workspace in `apps/` and `packages/`; Fastify public demo catalog, PostgreSQL migrations/RLS, pg-boss catalog-audit worker, unit/integration/process E2E tests |
+| Demo fixtures     | Trailside Supply: 20 products, 4 synthetic orders, 4 policies, 12 evaluation scenarios; separate isolation tenant                                                  |
+| Widget and admin  | Planned React interfaces; not yet implemented                                                                                                                      |
+| Connectors and AI | Shopify, CRM, AI retrieval, verified shopper access and helpdesk/email workflows remain planned                                                                    |
 
-The current store-wide broadcast behavior does not provide private per-shopper conversations. Browser visitor IDs do not establish customer identity. The runtime and test baseline must be established in [PER-13](https://linear.app/personal-rp501/issue/PER-13), with conversation isolation tracked in [PER-21](https://linear.app/personal-rp501/issue/PER-21).
+The foundation's tenant boundaries do not yet implement private shopper conversations. Conversation isolation is tracked in [PER-21](https://linear.app/personal-rp501/issue/PER-21), under [PER-13](https://linear.app/personal-rp501/issue/PER-13).
 
 ## Approved architecture
 
@@ -86,22 +82,8 @@ scripts/                       Local setup, migrations, seed and process supervi
 tests/                         Unit, real PostgreSQL and built-process E2E checks
 .github/                       CI, security checks and pull-request template
 compose.yaml                   Active local PostgreSQL/pgvector dependency
-docs/                          Product and architecture summaries; historical assets
-widget/
-  backend/                     Prototype Express/Socket.io server
-  chat-widget/                 React/Vite widget
-  test-env/                    Static prototype host page
-  docker-compose.dev.yml       Widget development stack
-  docker-compose.prod.yml      Existing static-build configuration
-voicely/
-  integrations/                Salesforce/HubSpot scaffolding
-  website/
-    frontend/                  Existing marketing/demo UI
-    app/
-      db/                      Legacy MySQL schema and test data
-      services/                Legacy Express services
-deploy/                        Historical deployment placeholder
-docker-compose.yml             Historical services/database configuration; not the startup path
+docs/                          Product, architecture, development and demo documentation
+docs/brand/                    Brand kit and usage guidance
 Makefile                       Convenience wrappers around Bun commands
 ```
 
@@ -109,7 +91,7 @@ Makefile                       Convenience wrappers around Bun commands
 
 The active workspace uses one `bun.lock`, pinned toolchain versions, strict TypeScript, ESLint, Prettier, Vitest and Playwright. `bun run verify` runs formatting, lint, compilation, unit tests, real PostgreSQL integration tests and built-process API/worker E2E tests. Test failures propagate correctly.
 
-The legacy packages and their lockfiles are outside the active workspace. Their current test suites are not claimed to pass. Their APIs and data model will be replaced; useful frontend/brand assets can be reused selectively. Any externally persisted legacy data still requires an inventory before migration or deletion.
+The obsolete `widget/` and `voicely/` prototypes, their lockfiles and legacy Compose configuration have been removed. They remain recoverable from Git history. Current brand assets are retained in `docs/brand/`. Repository cleanup does not migrate or delete externally persisted legacy data.
 
 GitHub workflow files are supplied. Remote CI execution, required branch checks and Renovate installation require repository activation; local passing checks do not establish those settings.
 

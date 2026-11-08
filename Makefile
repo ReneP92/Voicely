@@ -2,7 +2,7 @@
 
 help:
 	@echo "Voicely foundation (Bun): setup, dev, build, check, test, verify, db-start, db-stop"
-	@echo "See README.md. Legacy prototypes are outside the active workspace."
+	@echo "See README.md for setup and development instructions."
 
 setup:
 	bun run setup

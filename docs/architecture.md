@@ -2,7 +2,7 @@
 
 **Status: approved architecture baseline, with a local foundation implemented.** The [Linear project](https://linear.app/personal-rp501/project/voicely-ai-sales-and-support-agent-66ae94a7c2cb) is the source of truth. [PER-13](https://linear.app/personal-rp501/issue/PER-13) owns remaining contracts and validation. Stack approval does not establish production readiness.
 
-The [product scope](product.md) contains approved behavior. The [root README](../README.md#current-implementation) distinguishes the active foundation from historical prototypes. The older [Architecture.svg](Architecture.svg) is a historical survey-era diagram.
+The [product scope](product.md) contains approved behavior. The [root README](../README.md#current-implementation) distinguishes the active foundation from planned features. The older [Architecture.svg](Architecture.svg) is a historical survey-era diagram.
 
 ## Shape and tradeoffs
 
@@ -52,7 +52,7 @@ Request creation and outbox scheduling happen atomically in the database. The wo
 | Staff authentication / email | Cognito OIDC / SES                                                                                  | Tenant memberships, sender domain, SES production access, delivery events      |
 | Verification / operations    | Vitest, real PostgreSQL, Playwright; OpenTelemetry and CloudWatch                                   | Real connector contracts, quality measurements, production telemetry           |
 
-The new workspace implements configuration, public demo catalogs, database migrations/tenant-context RLS, transactional queue integration and a catalog-audit worker. The historical JavaScript/Express/Socket.io/MySQL application is outside that workspace. Real shopper authentication, AI, admin and commerce/delivery integrations are not implemented by this foundation.
+The workspace implements configuration, public demo catalogs, database migrations/tenant-context RLS, transactional queue integration and a catalog-audit worker. The historical JavaScript/Express/Socket.io/MySQL application has been removed and remains available in Git history. Real shopper authentication, AI, admin and commerce/delivery integrations are not implemented by this foundation.
 
 Demo infrastructure should be right-sized and initially Single-AZ for the database. Review availability before merchant production. Bound database pools and worker concurrency; include load balancers, networking, logs and backups in cost estimates. Measure quality and latency per dollar rather than assuming a larger model or instance is better.
 
