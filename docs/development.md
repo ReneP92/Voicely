@@ -24,6 +24,22 @@ The active workspace contains `apps/api`, `apps/worker` and `packages/core`. Bui
 
 API-only E2E tests do not download or launch a browser. Add actual browser coverage when the widget/admin is implemented. The tests currently establish foundation behavior, not a verified customer exchange, model quality or provider delivery.
 
+## Approved local product workflow (planned)
+
+[PER-33](https://linear.app/personal-rp501/issue/PER-33) owns the local runtime/adapters, including synthetic commerce; [PER-34](https://linear.app/personal-rp501/issue/PER-34) owns complete local acceptance. Follow the [PER-32 v2 local-first amendment](https://linear.app/personal-rp501/issue/PER-32). Local synthetic guest proof belongs to [PER-17](https://linear.app/personal-rp501/issue/PER-17); actual provider proof belongs to [PER-27](https://linear.app/personal-rp501/issue/PER-27).
+
+The first complete version must run locally from a fresh checkout without an AWS account or deployment. The existing commands above still provision only the foundation. Planned additions are:
+
+- React admin, widget and local storefront served by the local application stack.
+- Local OIDC for staff login, enforcing the same application membership and role checks as the later Cognito adapter.
+- Persistent filesystem-backed knowledge uploads/source storage, with tenant authorization and restart persistence; S3 follows later.
+- SMTP and Mailpit for destination verification, trusted-order-contact shopper codes and synthetic support-request capture; SES follows later.
+- A repeatable synthetic Trailside commerce adapter behind production domain contracts, separate from real Shopify/CRM validation.
+
+Interactive acceptance requires real model calls using user-configured provider credentials. Local does not mean fully offline. Ordinary CI uses deterministic model doubles without paid-provider calls; those tests cannot establish answer quality. Real Shopify and CRM integrations can be exercised from local services with provider credentials and a tunnel where callbacks/webhooks require one.
+
+Planned browser E2E covers fresh-checkout staff login, knowledge upload/publication, widget advice, guest verification, authorized order lookup, request review/submission and accurate Mailpit status. Verify destination setup, persistent state after restart, tenancy/shopper isolation, lost responses, cancellation, duplicate submission, worker fencing and uncertain sends. Preview remains non-dispatching. Local demo/runtime mail capture is restricted to synthetic tenants and does not prove human inbox delivery. Preserve PER-32 uncertainty handling, no blind resend, no automatic rerouting and provider-specific evidence.
+
 ## Configuration and data
 
 Copy `.env.example` only if `.env` does not exist; setup does this automatically. Runtime configuration errors identify invalid fields without echoing credentials. Environment variables override the file. For an isolated checkout, set `COMPOSE_PROJECT_NAME`, `POSTGRES_PORT`, and all three database URLs consistently before setup.
@@ -42,11 +58,11 @@ Migrations are append-only. The runner uses an advisory lock and validates previ
 
 `Foundation CI / Verify foundation` runs the same setup and verification from a clean GitHub runner. Separate dependency and secret workflows run Bun audit at high severity and Gitleaks over repository history. No paid providers are called by ordinary CI.
 
-After the workflows are committed and have run, configure branch protection to require `Verify foundation`, `Audit dependencies` and `Scan for secrets`. Require PR review and resolved conversations. These settings are not enabled merely by adding workflow files. Install/enable Renovate for the checked-in configuration; major updates are not auto-merged.
+The foundation and legacy-cleanup PRs have merged with successful remote CI. Required branch checks are not enforced. Configure branch protection to require `Verify foundation`, `Audit dependencies` and `Scan for secrets`, plus PR review and resolved conversations. Passing workflows do not establish those settings. Confirm installation/activation of Renovate for the checked-in configuration; major updates are not auto-merged.
 
 The current dependency audit reports one moderate development-only minimatch advisory through ESLint/type tooling (GHSA-g3hv-75wg-m249). Its fixed major removes APIs, so no incompatible forced override is applied. High/critical checks pass. Track the upstream-compatible update via dependency maintenance; untrusted glob patterns must not be fed into the lint tooling.
 
-GitHub deployment OIDC, image promotion and AWS staging are tracked in PER-30. Local setup does not require AWS credentials. No AWS deployment is included in this foundation.
+GitHub deployment OIDC, image promotion and AWS staging are tracked in [PER-30](https://linear.app/personal-rp501/issue/PER-30), now in milestone06 and blocked by PER-34, not a prerequisite for the local product. Neither current local setup nor the approved complete local workflow requires AWS credentials. No AWS deployment is included in this foundation.
 
 ## Troubleshooting
 
