@@ -26,6 +26,7 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parent
 TOKENS = dict(re.findall(r"--voicely-color-([\w-]+):\s*(#[0-9a-f]+)", (ROOT / "tokens.css").read_text()))
 INK, WHITE, CANVAS = (TOKENS[x] for x in ("ink", "surface", "canvas"))
+INSET = TOKENS["surface-muted"]
 STONE, LAVENDER, ORANGE = (TOKENS[x] for x in ("stone", "lavender", "orange"))
 MARK = ET.parse(ROOT / "source/mark.svg").find("{http://www.w3.org/2000/svg}path").attrib["d"]
 FONT = TTFont(ROOT / "fonts/Geist.ttf")
@@ -46,6 +47,8 @@ for foreground, background, threshold in (
     ("ink", "canvas", 4.5), ("surface", "ink", 4.5),
     ("muted", "surface", 4.5), ("muted", "canvas", 4.5),
     ("ink", "lavender", 4.5), ("surface", "orange", 4.5),
+    ("orange", "canvas", 4.5), ("ink", "surface-muted", 4.5),
+    ("muted", "surface-muted", 4.5),
     ("control-border", "surface", 3), ("control-border", "canvas", 3),
     ("error", "error-surface", 4.5), ("success", "success-surface", 4.5),
     ("warning", "warning-surface", 4.5),
@@ -108,7 +111,7 @@ social = rect(0, 0, 1200, 630, CANVAS)
 social += lockup(70, 50, 0.65, signature=True)
 social += rect(72, 160, 1056, 1, STONE)
 social += text("Good answers.", 72, 292, 76, 600, tracking=-2.5)[0]
-social += text("Better shopping.", 72, 376, 76, 600, tracking=-2.5)[0]
+social += text("Better shopping.", 72, 376, 76, 600, color=ORANGE, tracking=-2.5)[0]
 social += text("AI sales & support for your store.", 75, 444, 27, color=TOKENS["muted"])[0]
 social += rect(72, 534, 154, 38, LAVENDER, 6)
 social += text("Made for commerce", 86, 559, 14, 500)[0]
@@ -119,7 +122,7 @@ save("voicely-social.svg", 1200, 630, social, "Voicely. Good answers. Better sho
 hero = rect(0, 0, 1600, 900, CANVAS)
 hero += lockup(88, 66, 0.65, signature=True)
 hero += text("Good answers.", 88, 360, 78, 600, tracking=-2.5)[0]
-hero += text("Better shopping.", 88, 450, 78, 600, tracking=-2.5)[0]
+hero += text("Better shopping.", 88, 450, 78, 600, color=ORANGE, tracking=-2.5)[0]
 hero += text("AI sales & support for your store.", 92, 516, 28, color=TOKENS["muted"])[0]
 hero += rect(92, 574, 180, 54, INK, 6)
 hero += text("Meet voicely", 119, 609, 21, 500, WHITE)[0]
@@ -127,11 +130,11 @@ hero += rect(930, 160, 574, 608, WHITE, 12, STONE)
 hero += mark(960, 186, 38)
 hero += text("Shopping assistant", 1010, 214, 22, 600)[0]
 hero += rect(930, 244, 574, 1, STONE)
-hero += rect(1000, 280, 474, 62, CANVAS, 8)
+hero += rect(1000, 280, 474, 62, INSET, 8)
 hero += text("Which jacket works for rainy hikes?", 1018, 318, 22)[0]
 hero += text("The Rainline Shell is lightweight", 960, 402, 24)[0]
 hero += text("and made for wet weather.", 960, 436, 24)[0]
-hero += rect(960, 474, 514, 146, CANVAS, 8, STONE)
+hero += rect(960, 474, 514, 146, INSET, 8, STONE)
 hero += text("Rainline Shell", 984, 518, 26, 600)[0]
 hero += text("Waterproof / Lightweight", 984, 554, 20, color=TOKENS["muted"])[0]
 hero += text("View product details", 984, 592, 18, 500)[0]

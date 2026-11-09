@@ -9,8 +9,9 @@
 
 :root {
   color-scheme: light;
-  --voicely-color-canvas: #f8f8f6;
+  --voicely-color-canvas: #ffffff;
   --voicely-color-surface: #ffffff;
+  --voicely-color-surface-muted: #f8f8f6;
   --voicely-color-ink: #292524;
   --voicely-color-muted: #68625e;
   --voicely-color-stone: #e7e5e4;
@@ -18,6 +19,7 @@
   --voicely-color-lavender: #eee5f6;
   --voicely-color-orange: #b6532c;
   --voicely-color-orange-hover: #984322;
+  --voicely-color-heading-accent: var(--voicely-color-orange);
   --voicely-color-action: var(--voicely-color-ink);
   --voicely-color-action-hover: #443e3b;
   --voicely-color-on-action: #ffffff;

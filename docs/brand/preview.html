@@ -97,6 +97,23 @@
         align-items: center;
         gap: 10px;
         margin: 0 0 32px;
+        color: var(--voicely-color-heading-accent);
+      }
+      .heading-accent {
+        color: var(--voicely-color-heading-accent);
+      }
+      .section-marker {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        color: var(--voicely-color-heading-accent);
+      }
+      .section-marker::before {
+        content: '';
+        width: 20px;
+        height: 1px;
+        background: currentColor;
+        flex-shrink: 0;
       }
       .signature {
         width: 7px;
@@ -148,7 +165,7 @@
         border-color: var(--voicely-color-control-border);
       }
       .secondary:hover {
-        background: var(--voicely-color-canvas);
+        background: var(--voicely-color-surface-muted);
       }
       .caption {
         font-size: 12px;
@@ -199,7 +216,7 @@
         font-size: 16px;
       }
       .question {
-        background: var(--voicely-color-canvas);
+        background: var(--voicely-color-surface-muted);
         border-radius: 8px 8px 2px 8px;
         padding: 12px 14px;
         width: fit-content;
@@ -221,7 +238,7 @@
       .product-art {
         flex: 0 0 82px;
         height: 100px;
-        background: var(--voicely-color-canvas);
+        background: var(--voicely-color-surface-muted);
         border-radius: 4px;
         display: grid;
         place-items: center;
@@ -506,7 +523,7 @@
     <div class="shell">
       <header class="masthead">
         <img class="logo" src="voicely-logo-light.svg" alt="Voicely" width="480" height="112" />
-        <span class="meta">Brand foundations / Direction 03</span>
+        <span class="meta">Brand foundations / Direction 03.1</span>
         <nav aria-label="Brand navigation">
           <a href="#palette">Palette</a><a href="#details">Details</a
           ><a href="voicely-brand-kit.zip" download>Download kit ↗</a>
@@ -518,7 +535,9 @@
             <p class="eyebrow">
               <span class="signature" aria-hidden="true"></span> Considered by design
             </p>
-            <h1 id="headline">Good answers.<br />Better shopping.</h1>
+            <h1 id="headline">
+              Good answers.<br /><span class="heading-accent">Better shopping.</span>
+            </h1>
             <p class="intro">
               AI sales &amp; support for your store. A quiet interface. A clear next step.
             </p>
@@ -584,19 +603,21 @@
         </section>
         <section class="foundation" id="palette" aria-labelledby="palette-heading">
           <div class="section-head">
-            <h2 id="palette-heading">Neutrals lead. Color punctuates.</h2>
-            <span class="meta">01 / Color</span>
+            <h2 id="palette-heading">
+              A little <span class="heading-accent">color.</span> A lot of clarity.
+            </h2>
+            <span class="meta section-marker">01 / Color</span>
           </div>
           <div class="palette">
             <div>
               <div class="swatch" style="background: var(--voicely-color-canvas)"></div>
-              <div class="color-name">Off-white</div>
-              <div class="color-code">#F8F8F6</div>
+              <div class="color-name">White canvas</div>
+              <div class="color-code">#FFFFFF</div>
             </div>
             <div>
-              <div class="swatch" style="background: var(--voicely-color-surface)"></div>
-              <div class="color-name">White</div>
-              <div class="color-code">#FFFFFF</div>
+              <div class="swatch" style="background: var(--voicely-color-surface-muted)"></div>
+              <div class="color-name">Soft inset</div>
+              <div class="color-code">#F8F8F6</div>
             </div>
             <div>
               <div class="swatch" style="background: var(--voicely-color-ink)"></div>
@@ -620,8 +641,8 @@
             </div>
           </div>
           <p class="palette-note">
-            Approximately 95% neutrals, 4% lavender, 1% orange in product layouts. Orange is a
-            signature detail, not the default action color.
+            White space leads. Burnt orange gives a headline its voice; lavender quietly marks a
+            selection. Charcoal keeps the everyday interface clear.
           </p>
         </section>
         <section
@@ -630,7 +651,7 @@
           aria-label="Typography, identity and interface details"
         >
           <div>
-            <span class="meta">02 / Typography &amp; identity</span>
+            <span class="meta section-marker">02 / Typography &amp; identity</span>
             <p class="type-specimen">Clear, considered,<br />conversational.</p>
             <p class="detail-note">
               Geist. Confident headings, comfortable body text and compact labels. A geometric V
@@ -646,7 +667,7 @@
             </div>
           </div>
           <div>
-            <span class="meta">03 / Interface foundation</span>
+            <span class="meta section-marker">03 / Interface foundation</span>
             <div class="states">
               <a class="button" href="tokens.css" download>Download tokens</a
               ><span class="selected">✓ Product advice</span>
@@ -671,7 +692,7 @@
         </section>
       </main>
       <footer>
-        <span>Voicely / Warm neutrals, lavender, burnt orange.</span
+        <span>Voicely / White space. Warm character.</span
         ><span>Brand assets ready locally. Product implementation planned.</span>
       </footer>
     </div>
