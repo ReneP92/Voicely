@@ -1,46 +1,98 @@
-# Voicely brand starter kit
+# Voicely brand kit
 
-Proposed visual direction: a conversation-inspired V, indigo and teal accents, and a lowercase wordmark. This is a starter identity for review, not a change to approved product scope.
+**Approved direction:** warm neutrals, soft lavender and a tiny burnt-orange accent. The user accepted direction 03 and authorized the working kit. This replaces the original indigo/teal starter kit and the intermediate berry proposal. Product interfaces remain planned; the examples here are design specimens.
 
-## Assets
-
-| File | Use |
-| --- | --- |
-| `voicely-logo.png` | Original generated logo artwork with transparency |
-| `voicely-logo-light.png` | Trimmed transparent lockup with navy lettering for light backgrounds |
-| `voicely-logo-dark.png` | Transparent lockup with white lettering for dark backgrounds |
-| `voicely-mark.png` | Standalone transparent symbol, 512 x 512 |
-| `voicely-app-icon.png` | Square app/profile icon, 1024 x 1024 |
-| `apple-touch-icon.png` | Opaque touch icon, 180 x 180 |
-| `favicon-32.png` | Transparent favicon, 32 x 32 |
-| `favicon.ico` | Multi-size favicon: 16, 32, 48, 64, 128, and 256 pixels |
-| `voicely-hero.png` | Original conceptual website hero illustration |
-| `voicely-hero.webp` | Compressed hero artwork for web use |
-| `voicely-social.png` | Original brand introduction graphic |
-| `voicely-og.png` | Social/Open Graph graphic, 1200 x 630 |
-| `voicely-social.webp` | Compressed 1200 x 630 social graphic |
-| `voicely-brand-kit.zip` | Downloadable copy of the assets and this guide |
+Open [preview.html](preview.html) for the responsive identity and interface specimens, or download [voicely-brand-kit.zip](voicely-brand-kit.zip). The current editable source is `source/mark.svg`, the licensed font in `fonts/`, and `tokens.css`. `build.py` assembles outlined SVGs and raster exports. Concept images under `concepts/` are historical visual references, not exact colors or final geometry.
 
 ## Palette
 
-| Role | Color |
-| --- | --- |
-| Ink navy | `#0B1633` |
-| Indigo | `#4F46E5` |
-| Teal | `#2DD4BF` |
-| Pale lavender | `#EEF0FF` |
-| Off-white | `#FAFBFF` |
+| Role          | Color     | Use                                         |
+| ------------- | --------- | ------------------------------------------- |
+| Off-white     | `#F8F8F6` | Main canvas                                 |
+| White         | `#FFFFFF` | Panels, conversation surfaces               |
+| Charcoal      | `#292524` | Text, logo, primary actions and launcher    |
+| Stone         | `#E7E5E4` | Decorative separators and quiet surfaces    |
+| Soft lavender | `#EEE5F6` | Selected surfaces and occasional highlights |
+| Burnt orange  | `#B6532C` | Tiny signature detail                       |
 
-These are intended interface palette values. Generated artwork includes tonal variations and subtle gradients.
+Aim for roughly **95% neutrals, 4% lavender and 1% orange** in product layouts. This is a visual hierarchy, not a pixel quota. Flat fills, no gradients. Avoid large orange areas, orange conversation bubbles, and several competing saturated accents. Reducto's warm neutral/lavender palette was a reference; this is Voicely's own adapted system.
 
-## Usage
+Use `#68625E` for secondary text and `#87817C` for essential input/control outlines. Stone is intentionally too subtle to identify an input on its own. Functional error, success and warning colors have separate tokens and always accompany text or an icon. Never use the orange signature as an unread dot, availability indicator or delivery status.
 
-- Use navy lettering on light backgrounds and white lettering on dark backgrounds.
-- Preserve proportions and leave clear space of at least half the symbol height around a lockup.
-- Use the standalone symbol at small sizes instead of shrinking the full wordmark.
-- Use navy for body text; teal is an accent, not a body-text color on white.
-- Keep website headlines as live HTML in the hero's empty left region. The illustration is conceptual artwork, not a screenshot of implemented functionality.
-- Suggested interface typeface: Inter or a system sans-serif stack. The generated wordmark is raster artwork, not a supplied font.
-- Social copy: "AI sales & support. Built for your store." This is proposed marketing copy.
+## Identity
 
-The PNG masters are raster images. An editable vector master is not included. The standalone mark and app/favicon exports are derived from the primary logo to preserve the same symbol.
+- The geometric V includes a speech-tail. The primary lockup is entirely charcoal on light surfaces or white on charcoal.
+- The wordmark is outlined Geist at weight 700 with tightened spacing. All exported SVG artwork is font-independent. Do not substitute live text for the logo.
+- `voicely-logo-signature.svg` adds a small orange square for occasional marketing use. The ordinary logo, app icon, favicon and launcher have no orange dot or badge.
+- Preserve the SVG viewBox and proportions. Leave external clear space of at least one quarter of the symbol height on all sides. Do not stretch, recolor individual letterforms, add gradients or add effects.
+- Minimum displayed width: 120px for the lockup; 20px for a standalone interface mark. Use the dedicated favicon at 16px. At tiny sizes, use the mark rather than the wordmark.
+- The app/touch icon has an opaque square charcoal canvas so the platform can apply its own mask. The favicon has a modest rounded charcoal tile for legibility on both browser themes.
+
+## Typography and layout
+
+Use the locally supplied Geist variable font, with a system sans-serif fallback. Keep its [SIL Open Font License](fonts/OFL.txt) with redistributed assets. No third-party font request is needed.
+
+- Body: 16px / 1.5, weight 400. Compact admin text can be 14px. Widget message text should default to 16px in the actual product; the scaled board is illustrative.
+- Labels and actions: weight 500; section titles: 500-600. Strong marketing headings: 600, tight tracking and line height around 1.05-1.1.
+- Use a 4px spacing rhythm, clear alignment and whitespace instead of decorative cards everywhere.
+- Controls: 6px radius; cards: 8px; widget: 12px. Shadows only where elevation helps, such as the widget overlay.
+- Keep touch targets at least 44px in product UI. Preserve visible hover, focus, selected, disabled and loading states. Avoid motion unless it explains a state change; respect reduced motion.
+
+## Product application
+
+**Website:** bold charcoal typography on off-white, white product surfaces and occasional lavender highlights. Orange is punctuation. "Good answers. Better shopping." is a brand headline, not a measured quality claim.
+
+**Admin:** quiet white panels, fine separators and charcoal actions. Lavender can mark the selected navigation item, paired with a label, icon or weight change. Keep operational status colors separate.
+
+**Widget:** white conversation surface, charcoal launcher and compact branding. Merchant products and answers lead. Do not place a decorative square near the launcher; it resembles an unread notification. The approved example's square is deliberately omitted from the working assets. Preview is non-dispatching; nothing in this brand kit sends a message or calls a model.
+
+**Merchant customization:** merchant accent preferences are independent of the Voicely identity. Validate text, control and focus contrast for every supported accent and state. Use a safe foreground/action fallback if an accent fails; do not blindly put white text on arbitrary merchant colors. Logos remain monochrome unless separately approved. Import these tokens inside the admin or isolated widget iframe, never globally into a merchant's host page.
+
+## Accessibility
+
+`tokens.css` includes semantic colors, type, spacing, radius, focus and reduced-motion values. Use charcoal text on lavender, white text on charcoal, and underlined links. Orange is optional, not the default link color.
+
+The build-time palette review checks intended flat colors, not pixels from the generated concept image. Normal text needs 4.5:1; essential control boundaries and focus indicators need 3:1 against adjacent colors. Stone separators are decorative. A focus ring needs an offset from the control; on dark surfaces use a white ring. These tokens do not by themselves certify the future UI as accessible.
+
+## Assets
+
+| File                                                              | Purpose                                                                        |
+| ----------------------------------------------------------------- | ------------------------------------------------------------------------------ |
+| `source/mark.svg`                                                 | Editable single-path geometric mark; inherits `currentColor`                   |
+| `voicely-logo-light.svg`, `voicely-logo-dark.svg`                 | Outlined lockups for light/dark backgrounds                                    |
+| `voicely-logo-signature.svg`                                      | Optional marketing lockup with orange punctuation                              |
+| `voicely-logo-light.png`, `voicely-logo-dark.png`                 | Transparent 1920 x 448 raster lockups                                          |
+| `voicely-logo.png`                                                | Compatibility copy of the light-background lockup                              |
+| `voicely-mark.svg`, `voicely-mark-dark.svg`                       | Standalone charcoal/white marks                                                |
+| `voicely-mark.png`                                                | Transparent 512 x 512 mark                                                     |
+| `voicely-app-icon.svg`, `voicely-app-icon.png`                    | Opaque 1024 x 1024 app icon                                                    |
+| `apple-touch-icon.png`                                            | Opaque 180 x 180 touch icon                                                    |
+| `favicon.svg`, `favicon-32.png`, `favicon-256.png`, `favicon.ico` | Browser icons; ICO includes 16, 32, 48, 64, 128 and 256px                      |
+| `voicely-social.svg`, `voicely-social.png`, `voicely-social.webp` | 1200 x 630 typographic social artwork                                          |
+| `voicely-og.png`                                                  | 1200 x 630 Open Graph image                                                    |
+| `voicely-hero.svg`, `voicely-hero.png`, `voicely-hero.webp`       | 1600 x 900 editorial hero with illustrative synthetic conversation             |
+| `tokens.css`, `fonts/`                                            | Interface foundation and self-hosted licensed Geist                            |
+| `preview.html`                                                    | Responsive, non-dispatching visual reference                                   |
+| `voicely-brand-kit.zip`                                           | Current assets, guide, source, font/license and build tools; excludes concepts |
+
+Social and hero SVGs contain outlined display text. On a real website, use live HTML for the headline, links and controls; the illustration is not a functional interface. Provide appropriate alt text for informative images and empty alt text for decorative marks next to an existing name.
+
+## Rebuilding and checking
+
+From the repository root, with the normal Bun dependencies installed:
+
+```sh
+bunx --no-install playwright install chromium
+uv run --script docs/brand/build.py
+python3 -m http.server 4175 --bind 127.0.0.1 --directory docs/brand
+```
+
+Open `http://127.0.0.1:4175/preview.html`. The build pins its Python-only export dependencies through inline script metadata; it does not add application dependencies or a second JavaScript lockfile. Bun/Playwright renders SVGs; FontTools outlines the checked-in Geist; Pillow exports WebP and the multi-size ICO. A first build can download these development tools; the resulting kit works offline.
+
+Change the source mark, palette, font inputs or generator and rebuild instead of hand-editing generated SVG/raster exports. `tokens.css` is the source of export colors. Run the build again after editing the guide or preview so the archive matches. The previous indigo/teal assets remain available in Git history.
+
+Before shipping a consuming UI, verify keyboard/focus behavior, contrast, 200% zoom, mobile layouts, assistive-technology labels and every interaction state. Current checks cover the brand kit, not the unimplemented product.
+
+## Planning references
+
+The approved direction is recorded in [Linear P-PER-1](https://linear.app/personal-rp501/project/voicely-ai-sales-and-support-agent-66ae94a7c2cb), [PER-16 widget](https://linear.app/personal-rp501/issue/PER-16), [PER-18 admin](https://linear.app/personal-rp501/issue/PER-18) and [PER-32 screens](https://linear.app/personal-rp501/issue/PER-32). [Notion Brand & Assets](https://app.notion.com/p/40c44aa5359281baa1b6fded216157db) is the knowledge-hub summary. This kit is a local implementation of that direction, not evidence of a shipped application.
