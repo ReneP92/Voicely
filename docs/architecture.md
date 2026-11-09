@@ -6,7 +6,7 @@ The [product scope](product.md) contains approved behavior. The [root README](..
 
 ## Shape and tradeoffs
 
-Prefer a **modular monolith with a separately deployed background worker** sharing domain code. The API handles interactive work; the worker handles ingestion, synchronization, aggregate computation, and handoff delivery. Domain interfaces stay explicit while background capacity can scale independently.
+Prefer a **modular monolith with a separate background worker process** sharing domain code. The API handles interactive work; the worker handles ingestion, synchronization, aggregate computation, and handoff delivery. Domain interfaces stay explicit while background capacity can scale independently. The first complete product runs locally without an AWS account or deployment; independent cloud deployment is a later milestone.
 
 This avoids introducing distributed-service coordination before independent services are justified. A combined relational/retrieval store reduces initial data-system complexity. Revisit those choices based on measured workload, retrieval quality, and operational requirements.
 
@@ -38,23 +38,35 @@ Request creation and outbox scheduling happen atomically in the database. The wo
 
 ## Approved technology choices
 
-| Area                         | Approved baseline                                                                                   | Still to decide or validate                                                    |
-| ---------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| Language and admin           | Strict TypeScript; standalone React admin; Bun workspace/tooling                                    | Admin screens and Cognito OIDC integration                                     |
-| API                          | Supported Node.js LTS and Fastify                                                                   | First-slice request/response schemas, versioning and errors                    |
-| Persistence and retrieval    | RDS PostgreSQL, pgvector, full-text/exact SKU matching; RLS behind authorization                    | Filtered recall/latency, index strategy, existing data inventory               |
-| Documents                    | Private S3                                                                                          | Extraction quality and retention configuration                                 |
-| Jobs and delivery            | pg-boss with atomic business-record/job persistence                                                 | External retry/reconciliation contracts; independent business-record retention |
-| Widget                       | Async loader, lazy React iframe, versioned assets and rollback; Shopify theme app embed             | CSP, account/guest bootstrap and host-page behavior                            |
-| Chat transport               | HTTP submissions and authenticated SSE; fetch client for bearer headers                             | Replay/resume, reconnect, cancellation and actual ALB behavior                 |
-| Models                       | Provider SDK behind a small application-owned adapter                                               | Model/embedding/extraction evaluation on merchant cases                        |
-| Deployment                   | AWS us-east-1; ECS Fargate/ALB, RDS, S3/CloudFront, Secrets Manager; CDK TypeScript and GitHub OIDC | Actual staging deployment, IAM/networking, cost estimate, restore/rollout      |
-| Staff authentication / email | Cognito OIDC / SES                                                                                  | Tenant memberships, sender domain, SES production access, delivery events      |
-| Verification / operations    | Vitest, real PostgreSQL, Playwright; OpenTelemetry and CloudWatch                                   | Real connector contracts, quality measurements, production telemetry           |
+| Area                         | Approved baseline                                                                                      | Still to decide or validate                                                    |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------ |
+| Language and admin           | Strict TypeScript; standalone React admin; Bun workspace/tooling                                       | Admin screens and local OIDC integration; Cognito later                        |
+| API                          | Supported Node.js LTS and Fastify                                                                      | First-slice request/response schemas, versioning and errors                    |
+| Persistence and retrieval    | Local PostgreSQL, pgvector, full-text/exact SKU matching; RLS behind authorization; RDS later          | Filtered recall/latency, index strategy, existing data inventory               |
+| Documents                    | Persistent filesystem-backed storage adapter locally; private S3 later                                 | Extraction quality, tenant isolation and retention configuration               |
+| Jobs and delivery            | pg-boss with atomic business-record/job persistence                                                    | External retry/reconciliation contracts; independent business-record retention |
+| Widget                       | Async loader, lazy React iframe, versioned assets and rollback; Shopify theme app embed                | CSP, account/guest bootstrap and host-page behavior                            |
+| Chat transport               | HTTP submissions and authenticated SSE; fetch client for bearer headers                                | Replay/resume, reconnect, cancellation and actual ALB behavior                 |
+| Models                       | Provider SDK behind a small application-owned adapter                                                  | Model/embedding/extraction evaluation on merchant cases                        |
+| Deployment                   | Local-first; later AWS us-east-1 via ECS Fargate/ALB, RDS, S3/CloudFront, Secrets Manager and CDK/OIDC | PER-30 staging, IAM/networking, cost estimate, restore/rollout                 |
+| Staff authentication / email | Local OIDC and SMTP/Mailpit; Cognito and SES adapters later                                            | Membership checks, local capture evidence; later sender domain and SES events  |
+| Verification / operations    | Vitest, real PostgreSQL, Playwright; OpenTelemetry; CloudWatch with later AWS deployment               | Browser journey, real connector contracts, quality and production telemetry    |
 
 The workspace implements configuration, public demo catalogs, database migrations/tenant-context RLS, transactional queue integration and a catalog-audit worker. The historical JavaScript/Express/Socket.io/MySQL application has been removed and remains available in Git history. Real shopper authentication, AI, admin and commerce/delivery integrations are not implemented by this foundation.
 
-Demo infrastructure should be right-sized and initially Single-AZ for the database. Review availability before merchant production. Bound database pools and worker concurrency; include load balancers, networking, logs and backups in cost estimates. Measure quality and latency per dollar rather than assuming a larger model or instance is better.
+For later AWS demo deployment, infrastructure should be right-sized and initially Single-AZ for the database. Review availability before merchant production. Bound database pools and worker concurrency; include load balancers, networking, logs and backups in cost estimates. Measure quality and latency per dollar rather than assuming a larger model or instance is better.
+
+### Approved local product target (planned)
+
+[PER-33](https://linear.app/personal-rp501/issue/PER-33) owns the local runtime and adapters, including synthetic commerce. [PER-34](https://linear.app/personal-rp501/issue/PER-34) owns complete local acceptance against the [PER-32 v2 local-first amendment](https://linear.app/personal-rp501/issue/PER-32).
+
+The React admin, widget and local storefront will use the same API, domain contracts and worker as later deployments. Local OIDC must exercise current staff memberships and role checks rather than bypass authentication. Knowledge uploads and source versions will persist on the filesystem across process restarts, with tenant-scoped access behind a storage adapter. S3 and Cognito are later adapters, not requirements for local acceptance.
+
+SMTP with Mailpit will support destination verification, guest shopper codes and support-request capture for synthetic tenants. Preview must remain non-dispatching; the local storefront/runtime is the dispatch-capable synthetic journey. Mailpit capture and SMTP acceptance are local evidence only, not human inbox delivery or validation of SES events.
+
+The synthetic Trailside commerce adapter will implement production domain contracts for repeatable local journeys. Real Shopify and CRM integrations can also run from local services with credentials and a tunnel for callbacks/webhooks where required; they retain separate provider-validation gates. A synthetic adapter does not validate provider identity, permissions or synchronization.
+
+Interactive acceptance requires real model calls with user-configured provider credentials. Deterministic model doubles are limited to ordinary CI and do not establish AI quality. Local operation is not fully offline. None of these product adapters or interfaces is implemented by the current foundation.
 
 ## Module boundaries
 
@@ -74,6 +86,7 @@ Each module owns access to its data and exposes an explicit interface. Use an ex
 ## Identity and tenant isolation
 
 - A public widget site ID selects configuration. It is not a secret or proof of shopper identity.
+- Staff authenticate through local OIDC first, with the same current application memberships and role checks required for the later Cognito adapter.
 - Issue server-owned sessions and conversation IDs. Authorize history, streaming, citations, tool results, and request access against tenant and shopper scope.
 - Anonymous visitors receive approved public product/policy information. Private orders and CRM records require verified identity and record-level access.
 - Validate a Shopify-supported identity flow in a development store. Custom sites may use short-lived backend-signed assertions with signature, audience, tenant, expiry, and replay checks.
@@ -89,7 +102,7 @@ Store manuals, product descriptions, and policies as versioned sources with sear
 
 Access private orders and CRM history through structured, authorized tools. Keep prices, availability, and fulfillment facts structured with provenance and freshness rules. Avoid placing all raw CRM/order records in a shared vector index.
 
-Shopify is the initial commerce source; HubSpot is the first CRM, followed by Salesforce. Define source precedence, customer/product mappings, and duplicate-purchase handling in [PER-20](https://linear.app/personal-rp501/issue/PER-20). A CRM connection does not automatically authorize helpdesk ticket creation.
+Shopify is the initial real commerce source; the local synthetic Trailside adapter uses the same domain contracts. HubSpot is the first CRM, followed by Salesforce. Define source precedence, customer/product mappings, and duplicate-purchase handling in [PER-20](https://linear.app/personal-rp501/issue/PER-20). A CRM connection does not automatically authorize helpdesk ticket creation.
 
 Use background sync for catalogs/history and on-demand refresh for facts that exceed workflow freshness limits. Missing, stale, or conflicting data should produce clarification or a staff request rather than an invented answer.
 
@@ -126,15 +139,15 @@ The approved model has no internal support-agent inbox, staff assignment/live ta
 
 ## First-slice contract specification
 
-**Status: specified in [PER-32](https://linear.app/personal-rp501/issue/PER-32), pending implementation review and external validation.** That issue is the authoritative detailed specification, including endpoint fields, screen states, ownership constraints, wire examples, failure transitions and the verification matrix. The current foundation still exposes only health and synthetic catalog endpoints.
+**Status: specified in [PER-32 v2, including the local-first amendment](https://linear.app/personal-rp501/issue/PER-32), pending implementation review and external validation.** That issue is the authoritative detailed specification, including endpoint fields, screen states, ownership constraints, wire examples, failure transitions and the verification matrix. The current foundation still exposes only health and synthetic catalog endpoints.
 
 ### Identity and HTTP
 
-- Staff roles are owner, editor and reviewer, backed by current application memberships and Cognito identity.
+- Staff roles are owner, editor and reviewer, backed by current application memberships and local OIDC identity first; Cognito follows with the same authorization checks.
 - New routes use `/v1/admin/tenants/{tenantId}` and `/v1/widget`; Shopify/SES ingress lives under `/v1/integrations`. Foreign resources return indistinguishable denials.
 - HTTP contracts use Fastify-native JSON Schema, with generated OpenAPI/client types and a CI drift check when implemented.
 - Anonymous bootstrap creates a fresh empty session. A public idempotency key must never replay bearer credentials. Access tokens last 5 minutes and opaque resume tokens have a 24-hour absolute lifetime; optional browser storage is not required for public functionality.
-- Private access requires a scoped grant, capped at 15 minutes for the first slice. Guest proof is tied to the trusted order contact and grants only that order. Actual Shopify/account-switch coverage remains PER-27's validation gate.
+- Private access requires a scoped grant, capped at 15 minutes for the first slice. Guest proof uses a one-use code sent to the trusted order contact and grants only that order. Consume the code atomically; repeated or concurrent redemption cannot create another grant or extend its lifetime. [PER-17](https://linear.app/personal-rp501/issue/PER-17) owns local synthetic guest proof; [PER-27](https://linear.app/personal-rp501/issue/PER-27) owns actual provider proof, including Shopify/account-switch validation.
 - Upgrading proof increments the identity epoch and invalidates prior access tokens; the iframe renews through its existing secret resume token. Account switching/logout revokes the full session and starts a new conversation.
 - Authenticated mutations use principal/resource-scoped idempotency keys and canonical payload hashes. Revisioned configuration/drafts use `If-Match`; submit includes the reviewed revision. Unique message/draft constraints outlive the 24-hour transport replay cache.
 
@@ -149,9 +162,10 @@ The approved model has no internal support-agent inbox, staff assignment/live ta
 
 ### Delivery and recovery
 
-- Track independent `dispatchState` (`queued`, `sending`, `retry_wait`, `uncertain`, `accepted`, `failed`), `receiptState` (`unknown`, `delivered`, `bounced`, `rejected`, `complained`) and `resolutionState` (`unknown`, `confirmed` with evidence). SES resolution remains unknown in this slice.
+- Track independent `dispatchState` (`queued`, `sending`, `retry_wait`, `uncertain`, `accepted`, `failed`), `receiptState` (`unknown`, `delivered`, `bounced`, `rejected`, `complained`) and `resolutionState` (`unknown`, `confirmed` with evidence). SMTP/Mailpit capture does not establish human recipient delivery or resolution; SES resolution also remains unknown in this slice.
 - Persist attempt phase `prepared`, then `calling` before the external call. A crash/timeout after the call may have started enters `uncertain`; expired leases do not authorize another send.
-- SES `SendEmail` has no idempotency-token field. Disable automatic SDK retries for ambiguous sends. Correlate configuration-set events using persisted request/attempt tags and message IDs; event absence is not evidence of non-delivery.
+- Fence delivery attempts so stale workers cannot authorize another call or overwrite newer state. SMTP acknowledgement loss or interruption after a possible send preserves `uncertain`; do not blindly resend or reroute. Record SMTP/Mailpit-specific evidence without inventing SES event semantics.
+- For the later SES adapter, `SendEmail` has no idempotency-token field. Disable automatic SDK retries for ambiguous sends. Correlate configuration-set events using persisted request/attempt tags and message IDs; event absence is not evidence of non-delivery.
 - Only definitive transient non-acceptance permits bounded retries: at most five calls, with 5-second, 30-second, 2-minute and 10-minute delays plus jitter, respecting longer provider backoff and a 24-hour deadline.
 - Freeze the destination at submit. Uncertain requests cannot be resent through shopper or admin retry controls. Keep late delivery/bounce evidence without last-arrival-wins state corruption.
 
@@ -172,7 +186,9 @@ Use PER-32's endpoint contracts for widget bootstrap, messages/streaming/resume,
 
 ## First slice and verification
 
-Implement the [first integrated product slice](product.md#first-integrated-slice). Exercise two merchants and two shoppers, private-history isolation, expired identity, policy conflicts, stale/unavailable Shopify, duplicate submission, reconnect, worker restart, email failure/bounce, and helpdesk timeout after remote success.
+Implement the [first integrated product slice](product.md#first-integrated-slice) as browser E2E from a fresh checkout: local staff login, knowledge publication, widget buying advice, guest verification, authorized synthetic order access, request review, submit and truthful Mailpit status. Include destination verification, persistent knowledge and workflow state after restart, two merchants/two shoppers, private-history isolation, expired identity, repeated/concurrent proof redemption, policy conflicts, stale/unavailable commerce facts, lost responses, cancellation, duplicate submission, reconnect, worker fencing and uncertain SMTP sending.
+
+Use real models for interactive acceptance and deterministic doubles for ordinary CI. Separately validate real Shopify/CRM from local services with credentials/tunnels, and provider-specific email failure/bounce and helpdesk timeout after remote success. Local capture does not satisfy those provider gates. [PER-30](https://linear.app/personal-rp501/issue/PER-30) is in milestone06 and blocked by [PER-34 local acceptance](https://linear.app/personal-rp501/issue/PER-34).
 
 Cover both handoff routes before enabling them for pilot merchants. Measure sales/support answer quality separately from delivery and resolution. [PER-22](https://linear.app/personal-rp501/issue/PER-22) owns operational readiness, load, backup/restore, migration/rollback, quotas, alerts, and failure recovery.
 

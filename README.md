@@ -2,7 +2,7 @@
 
 Voicely is a planned AI sales and support service for B2C SMEs, starting with **physical-product Shopify shops**. Customers interact through a pop-up website chat widget for product advice, verified order enquiries, and return/exchange guidance. Requests needing staff go to an existing helpdesk or the merchant's support email, with human follow-up by email.
 
-**Status: local engineering foundation.** The Bun workspace runs a Fastify API, a separately deployed pg-boss worker, PostgreSQL/pgvector, and repeatable synthetic demo fixtures. The customer-facing AI application, merchant admin, Shopify integration and external delivery are still planned.
+**Status: local engineering foundation.** The Bun workspace runs a Fastify API, a separate pg-boss worker process, PostgreSQL/pgvector, and repeatable synthetic demo fixtures. The customer-facing AI application, merchant admin, Shopify integration and external delivery are still planned. The approved first version will be fully functional locally without an AWS account or deployment. Local does not mean fully offline: interactive acceptance requires real model calls with user-configured provider credentials.
 
 ## Quick start
 
@@ -29,7 +29,9 @@ When a decision changes, reconcile the Linear overview and affected issues, then
 
 - [Product scope and escalation flow](docs/product.md)
 - [Approved system architecture](docs/architecture.md)
-- [First-slice screens, API contracts and state transitions (PER-32)](https://linear.app/personal-rp501/issue/PER-32)
+- [First-slice screens, API contracts and state transitions (PER-32 v2, local-first amendment)](https://linear.app/personal-rp501/issue/PER-32)
+- [Local runtime and adapters, including synthetic commerce (PER-33)](https://linear.app/personal-rp501/issue/PER-33)
+- [Complete local acceptance (PER-34)](https://linear.app/personal-rp501/issue/PER-34)
 - [Development workflow and verification](docs/development.md)
 - [Trailside Supply demo fixtures](docs/demo.md)
 - [Brand assets and usage](docs/brand/README.md)
@@ -68,9 +70,11 @@ The foundation's tenant boundaries do not yet implement private shopper conversa
 
 ## Approved architecture
 
-A strict TypeScript modular monolith with separately deployed workers, a standalone React admin, and an independently distributed iframe widget. Bun supplies workspace tooling; Node.js/Fastify runs the services. PostgreSQL provides relational data, pgvector/full-text retrieval and pg-boss transactional jobs. Chat will use HTTP submissions and authenticated SSE.
+A strict TypeScript modular monolith with separate worker processes, a standalone React admin, and an independently distributed iframe widget. Bun supplies workspace tooling; Node.js/Fastify runs the services. PostgreSQL provides relational data, pgvector/full-text retrieval and pg-boss transactional jobs. Chat will use HTTP submissions and authenticated SSE.
 
-AWS `us-east-1` is selected: ECS Fargate/ALB, RDS PostgreSQL, S3/CloudFront, Cognito, SES, Secrets Manager and CloudWatch. CDK/OIDC deployment is tracked in [PER-30](https://linear.app/personal-rp501/issue/PER-30); nothing is deployed by local setup. Application code controls identity, authorization, tools and delivery. See [architecture](docs/architecture.md) for boundaries and remaining validation.
+The planned local stack adds the React admin/widget and local storefront, a local OIDC provider with the same application membership/authorization checks, persistent filesystem-backed knowledge storage, and SMTP with Mailpit for destination verification, shopper codes and synthetic support email. A synthetic Trailside commerce adapter will use production domain contracts. Real Shopify and CRM validation can run from local services with provider credentials and a tunnel where required.
+
+AWS `us-east-1` remains the later deployment target: ECS Fargate/ALB, RDS PostgreSQL, S3/CloudFront, Cognito, SES, Secrets Manager and CloudWatch. [PER-30](https://linear.app/personal-rp501/issue/PER-30) owns CDK/OIDC deployment in milestone06 and is blocked by [PER-34 local acceptance](https://linear.app/personal-rp501/issue/PER-34), not a prerequisite for the local product. Application code controls identity, authorization, tools and delivery. See [architecture](docs/architecture.md) for boundaries and remaining validation.
 
 ## Repository layout
 
@@ -93,13 +97,13 @@ The active workspace uses one `bun.lock`, pinned toolchain versions, strict Type
 
 The obsolete `widget/` and `voicely/` prototypes, their lockfiles and legacy Compose configuration have been removed. They remain recoverable from Git history. Current brand assets are retained in `docs/brand/`. Repository cleanup does not migrate or delete externally persisted legacy data.
 
-GitHub workflow files are supplied. Remote CI execution, required branch checks and Renovate installation require repository activation; local passing checks do not establish those settings.
+The foundation and legacy-cleanup PRs have merged with successful remote CI. Required branch checks are not enforced; passing CI does not establish branch protection. Renovate installation still requires confirmation.
 
 ## Delivery outline
 
-The Linear milestones cover demand validation, platform foundations, grounded conversations, commerce/CRM identity, aggregate recommendations, and a measured pilot. The first integrated slice is a verified Shopify exchange enquiry delivered once to merchant support email, alongside a buying-advice example and validation of the connected-helpdesk route.
+The Linear milestones cover demand validation, platform foundations, grounded conversations, commerce/CRM identity, aggregate recommendations, and a measured pilot. The first integrated slice runs locally: merchant login, knowledge publication, widget buying advice, guest verification, authorized synthetic order lookup, request review/submission and truthful Mailpit capture status. Browser acceptance will cover restart, tenancy, lost responses, cancellation, duplicate submission and uncertain sending. Preview remains non-dispatching; local demo mail capture is restricted to synthetic tenants. SMTP acceptance does not prove human inbox delivery.
 
-The initial market is US English, physical-product ecommerce. Trailside Supply is a fictional outdoor clothing/accessories demo, not a design partner. HubSpot CRM precedes Salesforce; SES is the initial email provider. Shopper proof, model evaluation, helpdesk capabilities, measured costs and release timing remain open. Consult Linear for current priorities and dependencies.
+The initial market is US English, physical-product ecommerce. Trailside Supply is a fictional outdoor clothing/accessories demo, not a design partner. HubSpot CRM precedes Salesforce; SES is the later AWS email adapter. Real Shopify/CRM and connected-helpdesk checks remain separate provider-validation gates. Deterministic model doubles support ordinary CI, not interactive AI acceptance or quality claims. Shopper proof, model evaluation, helpdesk capabilities, measured costs and release timing remain open. Consult Linear for current priorities and dependencies.
 
 ## Historical references
 
