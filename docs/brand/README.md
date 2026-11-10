@@ -4,6 +4,8 @@
 
 Open [preview.html](preview.html) for the responsive identity and interface specimens, or download [voicely-brand-kit.zip](voicely-brand-kit.zip). The current editable source is `source/mark.svg`, the licensed font in `fonts/`, and `tokens.css`. `build.py` assembles outlined SVGs and raster exports. Concept images under `concepts/` are historical visual references, not exact colors or final geometry.
 
+The [landing-page illustration and motion gallery](landing/index.html) adds three original scenes: product advice, grounded answers and reviewed email handoff. Each has a static SVG/PNG export and a short, replayable animation with reduced-motion support. See [integration and motion guidance](landing/README.md).
+
 ## Palette
 
 | Role          | Color     | Use                                                                       |

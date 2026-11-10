@@ -22,6 +22,7 @@ from fontTools.varLib.instancer import instantiateVariableFont
 from fontTools.pens.svgPathPen import SVGPathPen
 from fontTools.pens.transformPen import TransformPen
 from PIL import Image
+from landing.artwork import create_scenes
 
 ROOT = Path(__file__).resolve().parent
 TOKENS = dict(re.findall(r"--voicely-color-([\w-]+):\s*(#[0-9a-f]+)", (ROOT / "tokens.css").read_text()))
@@ -143,6 +144,8 @@ hero += text("Ask a question...", 980, 710, 20, color=TOKENS["muted"])[0]
 hero += text("Illustrative conversation / synthetic product", 960, 810, 16, color=TOKENS["muted"])[0]
 save("voicely-hero.svg", 1600, 900, hero, "Voicely brand illustration with a synthetic shopping conversation")
 
+create_scenes(save, text, rect, mark, TOKENS)
+
 jobs = [
     ("voicely-logo-light.svg", "voicely-logo-light.png", 1920, 448),
     ("voicely-logo-light.svg", "voicely-logo.png", 1920, 448),
@@ -155,6 +158,9 @@ jobs = [
     ("voicely-social.svg", "voicely-social.png", 1200, 630),
     ("voicely-social.svg", "voicely-og.png", 1200, 630),
     ("voicely-hero.svg", "voicely-hero.png", 1600, 900),
+    ("landing/product-advice.svg", "landing/product-advice.png", 1800, 1200),
+    ("landing/grounded-answers.svg", "landing/grounded-answers.png", 1800, 1200),
+    ("landing/human-handoff.svg", "landing/human-handoff.png", 1800, 1200),
 ]
 with tempfile.TemporaryDirectory(prefix="voicely-brand-") as temp:
     manifest = Path(temp) / "render.json"
