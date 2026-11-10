@@ -1,21 +1,23 @@
 # Voicely brand kit
 
-**Approved direction:** warm neutrals, soft lavender and a tiny burnt-orange accent. The user accepted direction 03 and authorized the working kit. This replaces the original indigo/teal starter kit and the intermediate berry proposal. Product interfaces remain planned; the examples here are design specimens.
+**Approved direction:** white backgrounds, charcoal, soft lavender and selective burnt-orange headline accents. Direction 03.1 refines the accepted minimal identity with a brighter canvas and a little more color in the typography. The original kit shipped to the repository in [PR #4](https://github.com/ReneP92/Voicely/pull/4); this refinement replaces its off-white main background and tiny-accent-only rule. Product interfaces remain planned; the examples here are design specimens.
 
 Open [preview.html](preview.html) for the responsive identity and interface specimens, or download [voicely-brand-kit.zip](voicely-brand-kit.zip). The current editable source is `source/mark.svg`, the licensed font in `fonts/`, and `tokens.css`. `build.py` assembles outlined SVGs and raster exports. Concept images under `concepts/` are historical visual references, not exact colors or final geometry.
 
+The [landing-page illustration and motion gallery](landing/index.html) adds three original scenes: product advice, grounded answers and reviewed email handoff. Each has a static SVG/PNG export and a short, replayable animation with reduced-motion support. See [integration and motion guidance](landing/README.md).
+
 ## Palette
 
-| Role          | Color     | Use                                         |
-| ------------- | --------- | ------------------------------------------- |
-| Off-white     | `#F8F8F6` | Main canvas                                 |
-| White         | `#FFFFFF` | Panels, conversation surfaces               |
-| Charcoal      | `#292524` | Text, logo, primary actions and launcher    |
-| Stone         | `#E7E5E4` | Decorative separators and quiet surfaces    |
-| Soft lavender | `#EEE5F6` | Selected surfaces and occasional highlights |
-| Burnt orange  | `#B6532C` | Tiny signature detail                       |
+| Role          | Color     | Use                                                                       |
+| ------------- | --------- | ------------------------------------------------------------------------- |
+| White         | `#FFFFFF` | Main canvas, panels and conversation surfaces                             |
+| Soft inset    | `#F8F8F6` | Small inset surfaces and user message bubbles                             |
+| Charcoal      | `#292524` | Text, logo, primary actions and launcher                                  |
+| Stone         | `#E7E5E4` | Decorative separators and quiet surfaces                                  |
+| Soft lavender | `#EEE5F6` | Selected surfaces and occasional highlights                               |
+| Burnt orange  | `#B6532C` | Selected headline phrases, editorial section labels and signature details |
 
-Aim for roughly **95% neutrals, 4% lavender and 1% orange** in product layouts. This is a visual hierarchy, not a pixel quota. Flat fills, no gradients. Avoid large orange areas, orange conversation bubbles, and several competing saturated accents. Reducto's warm neutral/lavender palette was a reference; this is Voicely's own adapted system.
+**White space leads; orange gives the typography a voice.** Keep most of the interface neutral. Use burnt orange for one phrase in a major headline, such as "Better shopping.", and small editorial section markers. Let other headings, body text, actions and the launcher stay charcoal. Lavender remains a quiet selected-state surface. This replaces the earlier 95/4/1 split with a more expressive typographic hierarchy, not a new pixel quota. Flat fills, no gradients or large orange backgrounds. Reducto's warm neutral/lavender palette was a reference; this is Voicely's own adapted system.
 
 Use `#68625E` for secondary text and `#87817C` for essential input/control outlines. Stone is intentionally too subtle to identify an input on its own. Functional error, success and warning colors have separate tokens and always accompany text or an icon. Never use the orange signature as an unread dot, availability indicator or delivery status.
 
@@ -34,15 +36,16 @@ Use the locally supplied Geist variable font, with a system sans-serif fallback.
 
 - Body: 16px / 1.5, weight 400. Compact admin text can be 14px. Widget message text should default to 16px in the actual product; the scaled board is illustrative.
 - Labels and actions: weight 500; section titles: 500-600. Strong marketing headings: 600, tight tracking and line height around 1.05-1.1.
+- Color only the emphasized phrase of a major headline. Small section markers can use orange with a short fine rule; everyday form labels and operational headings stay charcoal or muted. Use `--voicely-color-heading-accent` for this editorial emphasis.
 - Use a 4px spacing rhythm, clear alignment and whitespace instead of decorative cards everywhere.
 - Controls: 6px radius; cards: 8px; widget: 12px. Shadows only where elevation helps, such as the widget overlay.
 - Keep touch targets at least 44px in product UI. Preserve visible hover, focus, selected, disabled and loading states. Avoid motion unless it explains a state change; respect reduced motion.
 
 ## Product application
 
-**Website:** bold charcoal typography on off-white, white product surfaces and occasional lavender highlights. Orange is punctuation. "Good answers. Better shopping." is a brand headline, not a measured quality claim.
+**Website:** pure white canvas, a charcoal-and-orange split headline, fine editorial section markers and occasional lavender highlights. Keep off-white in small inset surfaces rather than full-page backgrounds. "Good answers. Better shopping." is a brand headline, not a measured quality claim.
 
-**Admin:** quiet white panels, fine separators and charcoal actions. Lavender can mark the selected navigation item, paired with a label, icon or weight change. Keep operational status colors separate.
+**Admin:** white canvas and panels, fine separators and charcoal actions. A page-introduction headline can use a small orange emphasis; dense table headings and form labels stay neutral. Lavender can mark the selected navigation item, paired with a label, icon or weight change. Keep operational status colors separate.
 
 **Widget:** white conversation surface, charcoal launcher and compact branding. Merchant products and answers lead. Do not place a decorative square near the launcher; it resembles an unread notification. The approved example's square is deliberately omitted from the working assets. Preview is non-dispatching; nothing in this brand kit sends a message or calls a model.
 
@@ -50,7 +53,7 @@ Use the locally supplied Geist variable font, with a system sans-serif fallback.
 
 ## Accessibility
 
-`tokens.css` includes semantic colors, type, spacing, radius, focus and reduced-motion values. Use charcoal text on lavender, white text on charcoal, and underlined links. Orange is optional, not the default link color.
+`tokens.css` includes semantic colors, type, spacing, radius, focus and reduced-motion values. Use charcoal text on lavender, white text on charcoal, and underlined links. Burnt-orange headings on white have 4.93:1 contrast, sufficient even for normal text. Orange is optional, not the default link color. Distinguish the white canvas token from the off-white `surface-muted` token so inset contrast survives palette refinements.
 
 The build-time palette review checks intended flat colors, not pixels from the generated concept image. Normal text needs 4.5:1; essential control boundaries and focus indicators need 3:1 against adjacent colors. Stone separators are decorative. A focus ring needs an offset from the control; on dark surfaces use a white ring. These tokens do not by themselves certify the future UI as accessible.
 
